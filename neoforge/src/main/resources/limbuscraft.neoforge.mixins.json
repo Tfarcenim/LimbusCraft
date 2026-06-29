@@ -3,7 +3,11 @@
   "minVersion": "0.8",
   "package": "tfar.limbuscraft.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "AttributeSupplierBuilderAccess",
+    "DefaultAttributesAccess",
+    "EntityAttributeModificationEventAccess"
+  ],
   "client": [
   ],
   "server": [],
