@@ -1,5 +1,8 @@
 package tfar.limbuscraft.platform.services;
 
+import org.jetbrains.annotations.Nullable;
+import tfar.limbuscraft.attachments.CommonDataAttachment;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +36,22 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    <T> void registerDataAttachment(CommonDataAttachment<T> attachment);
+
+    @Nullable
+    <T> T getAttachedValue(Object object, CommonDataAttachment<T> attachment);
+
+    default <T> T getOrCreateAttachedValue(Object object, CommonDataAttachment<T> attachment) {
+        T value = getAttachedValue(object, attachment);
+        if (value != null) {
+            return value;
+        }
+        value = attachment.getDefaultValueSupplier().apply(object);
+        setAttachedValue(object, attachment, value);
+        return value;
+    }
+
+    <T> void setAttachedValue(Object object, CommonDataAttachment<T> attachment, @Nullable T value);
+
 }
