@@ -1,9 +1,11 @@
 package tfar.limbuscraft;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tfar.limbuscraft.attachments.CommonDataAttachments;
+import tfar.limbuscraft.attachments.DataAttachmentUtil;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -27,5 +29,13 @@ public class LimbusCraft {
 
     public static ResourceLocation id(String name) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+    }
+
+    public static void onLeaveCombat(LivingEntity livingEntity) {
+        DataAttachmentUtil.setSanity(livingEntity,0);
+    }
+
+    public static void onEnterCombat(LivingEntity livingEntity) {
+
     }
 }

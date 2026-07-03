@@ -1,7 +1,12 @@
 package tfar.limbuscraft;
 
 
+import com.mojang.brigadier.ParseResults;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -12,8 +17,10 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
@@ -37,6 +44,36 @@ public class LimbusCraftNeoForge {
         LimbusCraft.init();
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST,this::livingDamage);
         NeoForge.EVENT_BUS.addListener(this::commands);
+        NeoForge.EVENT_BUS.addListener(this::onCommand);
+        NeoForge.EVENT_BUS.addListener(this::controlTeleport);
+    }
+
+    void onCommand(CommandEvent event) {
+        ParseResults<CommandSourceStack> parseResults = event.getParseResults();
+        CommandSourceStack source = parseResults.getContext().getSource();
+        if (source.getEntity() instanceof ServerPlayer serverPlayer) {
+            boolean inCombat = serverPlayer.getCombatTracker().inCombat;
+            if (inCombat && !serverPlayer.getAbilities().instabuild) {
+                event.setCanceled(true);
+                serverPlayer.sendSystemMessage(Component.literal("Can't use that command in combat"));
+            }
+        }
+    }
+
+    void controlTeleport(EntityTeleportEvent event) {
+        if (!(event instanceof EntityTeleportEvent.EnderPearl)) {
+            Entity entity = event.getEntity();
+            if (entity instanceof LivingEntity livingEntity) {
+                boolean inCombat = livingEntity.getCombatTracker().inCombat;
+                if (!inCombat) return;
+                if (livingEntity instanceof ServerPlayer serverPlayer) {
+                    if (serverPlayer.getAbilities().instabuild) return;
+                    event.setCanceled(true);
+                } else {
+                    event.setCanceled(true);
+                }
+            }
+        }
     }
 
     void register(RegisterEvent event) {
