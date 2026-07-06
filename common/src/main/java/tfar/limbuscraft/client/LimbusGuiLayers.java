@@ -1,14 +1,17 @@
 package tfar.limbuscraft.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import tfar.limbuscraft.Color;
 import tfar.limbuscraft.LimbusCraft;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
+import tfar.limbuscraft.healthbar.*;
+import tfar.limbuscraft.platform.Services;
 
 public class LimbusGuiLayers {
 
@@ -26,6 +29,27 @@ public class LimbusGuiLayers {
             guiGraphics.blitSprite(SANITY_ORB, j, k, 0,16,16);
             Color.reset();
         }
+    };
+
+    public static final Health HEALTH = new Health(BarSettings.getBuilder().setColorProvider(new SingleColorProvider(Color.RED)).build());
+
+    public static final LayeredDraw.Layer HEALTH_ = (guiGraphics, deltaTracker) -> {
+        Entity entity = Minecraft.getInstance().getCameraEntity();
+        if (!(entity instanceof Player player)) return;
+        if (player.getAbilities().instabuild || player.isSpectator()) return;
+
+        BarOverlay overlay = HEALTH;
+        Gui gui = Minecraft.getInstance().gui;
+            BarSide side = overlay.getSide();
+            try {
+                if (overlay.render(gui, guiGraphics, player, Services.PLATFORM.getHeight(gui, side))) {
+                    Services.PLATFORM.raiseHeight(gui, side, 10);
+                }
+            } catch (Throwable e) {
+               LimbusCraft.LOG.error("disabling broken overlay {}", overlay.name());
+                e.printStackTrace();
+                overlay.setErrored();
+            }
     };
 
     public static Color sanityColor(int sanity) {

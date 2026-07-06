@@ -1,7 +1,9 @@
 package tfar.limbuscraft.platform.services;
 
+import net.minecraft.client.gui.Gui;
 import org.jetbrains.annotations.Nullable;
 import tfar.limbuscraft.attachments.CommonDataAttachment;
+import tfar.limbuscraft.healthbar.BarSide;
 
 public interface IPlatformHelper {
 
@@ -53,5 +55,8 @@ public interface IPlatformHelper {
     }
 
     <T> void setAttachedValue(Object object, CommonDataAttachment<T> attachment, @Nullable T value);
+
+    void raiseHeight(Gui gui, BarSide side, int amount);
+    int getHeight(Gui gui, BarSide side);
 
 }

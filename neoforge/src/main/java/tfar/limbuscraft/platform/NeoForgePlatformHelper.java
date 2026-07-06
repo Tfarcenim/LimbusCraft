@@ -1,11 +1,13 @@
 package tfar.limbuscraft.platform;
 
+import net.minecraft.client.gui.Gui;
 import net.minecraft.core.Registry;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import tfar.limbuscraft.attachments.CommonDataAttachment;
+import tfar.limbuscraft.healthbar.BarSide;
 import tfar.limbuscraft.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
@@ -74,5 +76,21 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         } else {
             throw new IllegalStateException("Cannot attach data to " + object);
         }
+    }
+
+    @Override
+    public void raiseHeight(Gui gui, BarSide side, int amount) {
+        switch (side) {
+            case LEFT -> gui.leftHeight+=amount;
+            case RIGHT -> gui.rightHeight+=amount;
+        }
+    }
+
+    @Override
+    public int getHeight(Gui gui, BarSide side) {
+        return switch (side){
+            case RIGHT -> gui.rightHeight;
+            case LEFT -> gui.leftHeight;
+        };
     }
 }
