@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import tfar.limbuscraft.platform.Services;
+import tfar.limbuscraft.tokens.TokenInstance;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -18,6 +20,13 @@ public class CommonDataAttachments {
                     .networkSynchronized(ByteBufCodecs.INT)
                     .codec(Codec.INT)
                     .build("sanity"));
+
+    public static final CommonDataAttachment<List<TokenInstance>> TOKENS = register(CommonDataAttachment
+            .<List<TokenInstance>>create(o -> List.of())
+            .networkSynchronized(TokenInstance.STREAM_CODEC.apply(ByteBufCodecs.list()))
+            .codec(TokenInstance.CODEC.listOf())
+            .build("tokens")
+    );
 
     public static CommonDataAttachment<?> lookup(ResourceLocation location) {
         return MAP.get(location);
