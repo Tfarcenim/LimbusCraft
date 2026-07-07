@@ -3,6 +3,7 @@ package tfar.limbuscraft.client;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -13,8 +14,13 @@ import tfar.limbuscraft.LimbusCraft;
 public class LimbusCraftClientNeoForge {
 
     public LimbusCraftClientNeoForge(IEventBus bus) {
+        bus.addListener(this::setup);
         bus.addListener(this::registerOverlay);
         NeoForge.EVENT_BUS.addListener(this::renderOverlayEvent);
+    }
+
+    void setup(FMLClientSetupEvent event) {
+        LimbusCraftClient.setup();
     }
 
     void registerOverlay(RegisterGuiLayersEvent event) {

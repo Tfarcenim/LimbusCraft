@@ -25,6 +25,7 @@ public class LimbusGuiLayers {
             int j = (guiGraphics.guiWidth() - 16) / 2;
             int k = guiGraphics.guiHeight() - 31 - 4-16;
             Color color = sanityColor(sanity);
+            guiGraphics.drawString(Minecraft.getInstance().font,sanity+"",j,k,color.colorToText());
             color.color2Gl();
             guiGraphics.blitSprite(SANITY_ORB, j, k, 0,16,16);
             Color.reset();

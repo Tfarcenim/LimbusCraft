@@ -22,6 +22,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
 import tfar.limbuscraft.mixin.DefaultAttributesAccess;
@@ -46,6 +47,13 @@ public class LimbusCraftNeoForge {
         NeoForge.EVENT_BUS.addListener(this::commands);
         NeoForge.EVENT_BUS.addListener(this::onCommand);
         NeoForge.EVENT_BUS.addListener(this::controlTeleport);
+        NeoForge.EVENT_BUS.addListener(this::entityTick);
+    }
+
+    void entityTick(EntityTickEvent.Post event) {
+        if (event.getEntity() instanceof LivingEntity livingEntity) {
+            LimbusCraft.entityTick(livingEntity);
+        }
     }
 
     void onCommand(CommandEvent event) {
