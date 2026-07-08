@@ -9,6 +9,7 @@
     "EntityAttributeModificationEventAccess"
   ],
   "client": [
+    "EntityRendererDispatcherMixin"
   ],
   "server": [],
   "injectors": {

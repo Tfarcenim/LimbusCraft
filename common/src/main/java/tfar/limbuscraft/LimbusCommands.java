@@ -28,7 +28,20 @@ public class LimbusCommands {
                                 )
                         )
                 )
+                .then(Commands.literal("token")
+                )
         );
+    }
+
+    static int addToken(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Collection<? extends Entity> entities = EntityArgument.getEntities(context,"targets");
+        int sanity = IntegerArgumentType.getInteger(context,"sanity");
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity livingEntity) {
+                DataAttachmentUtil.setSanity(livingEntity,sanity);
+            }
+        }
+        return 1;
     }
 
     static int setSanity(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
