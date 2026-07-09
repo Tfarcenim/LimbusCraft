@@ -4,12 +4,11 @@ import com.mojang.serialization.Codec;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import tfar.limbuscraft.platform.Services;
+import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
+import tfar.limbuscraft.tokens.TokenRegistry;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class CommonDataAttachments {
 
@@ -21,10 +20,12 @@ public class CommonDataAttachments {
                     .codec(Codec.INT)
                     .build("sanity"));
 
-    public static final CommonDataAttachment<List<TokenInstance>> TOKENS = register(CommonDataAttachment
-            .<List<TokenInstance>>create(o -> List.of())
-            .networkSynchronized(TokenInstance.STREAM_CODEC.apply(ByteBufCodecs.list()))
-            .codec(TokenInstance.CODEC.listOf())
+    public static final CommonDataAttachment<Map<Token,TokenInstance>> TOKENS = register(CommonDataAttachment
+            .<Map<Token,TokenInstance>>create(o -> Map.of())
+            .networkSynchronized(ByteBufCodecs.map(
+                    LinkedHashMap::new, TokenRegistry.TOKEN_STREAM_CODEC,TokenInstance.STREAM_CODEC
+            ))
+            .codec(Codec.unboundedMap(TokenRegistry.TOKEN_CODEC,TokenInstance.CODEC))
             .build("tokens")
     );
 

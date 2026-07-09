@@ -27,9 +27,11 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import tfar.limbuscraft.LimbusCraft;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
+import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 
 import java.util.List;
+import java.util.Map;
 
 @Mod(value = LimbusCraft.MOD_ID,dist = Dist.CLIENT)
 public class LimbusCraftClientNeoForge {
@@ -60,7 +62,7 @@ public class LimbusCraftClientNeoForge {
             if (net.neoforged.neoforge.client.ClientHooks.isNameplateInRenderDistance(livingEntity, d0)) {
                 Vec3 vec3 = livingEntity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, livingEntity.getViewYRot(partialTick));
                 if (vec3 != null) {
-                    List<TokenInstance> tokens = DataAttachmentUtil.getTokens(livingEntity);
+                    Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(livingEntity);
                     poseStack.pushPose();
                     poseStack.translate(vec3.x, vec3.y + 0.5, vec3.z);
 
@@ -82,15 +84,15 @@ public class LimbusCraftClientNeoForge {
                     MobEffectTextureManager mobeffecttexturemanager = Minecraft.getInstance().getMobEffectTextures();
                     TextureAtlasSprite textureatlassprite = mobeffecttexturemanager.get(MobEffects.POISON);
 
-                    builder.addVertex(matrix4f, width, 0, z)
+                    builder.addVertex(matrix4f, width, height, z)
                             .setUv(textureatlassprite.getU1(), textureatlassprite.getV0()).setColor(1f, 1f, 1f, 1f)
                             .setLight(packedLight);
-                    builder.addVertex(matrix4f, width, height, z)
+                    builder.addVertex(matrix4f, width, 0, z)
                             .setUv(textureatlassprite.getU1(), textureatlassprite.getV1()).setColor(1f, 1f, 1f, 1f)
                             .setLight(packedLight);
-                    builder.addVertex(matrix4f, 0, height, z).setUv(textureatlassprite.getU0(), textureatlassprite.getV1())
+                    builder.addVertex(matrix4f, 0, 0, z).setUv(textureatlassprite.getU0(), textureatlassprite.getV1())
                             .setColor(1f, 1f, 1f, 1f).setLight(packedLight);
-                    builder.addVertex(matrix4f, 0, 0, z)
+                    builder.addVertex(matrix4f, 0, height, z)
                             .setUv(textureatlassprite.getU0(), textureatlassprite.getV0())
                             .setColor(1f, 1f, 1f, 1f).setLight(packedLight);
 
