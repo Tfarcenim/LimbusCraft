@@ -70,12 +70,21 @@ public class LimbusCraftClientNeoForge {
                 Vec3 vec3 = livingEntity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, livingEntity.getViewYRot(partialTick));
                 if (vec3 != null) {
                     Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(livingEntity);
-                    poseStack.pushPose();
-                    poseStack.translate(vec3.x, vec3.y + 0.5, vec3.z);
-
-                    poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
-                   // poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
+                    float w = 1;
+                    float labelWidth =1;
+                    float xStart = -tokens.size() * w / 2;
+                    float scale = 1f;
+                    int i = 0;
                     for (TokenInstance token : tokens.values()) {
+                        float x = xStart + i * w;
+                        poseStack.pushPose();
+                        poseStack.translate(vec3.x, vec3.y + 0.5, vec3.z);
+
+                        poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
+
+                        poseStack.scale(scale, scale, scale);
+
+                        // poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
                     Component displayName = livingEntity.getDisplayName();//todo use event?
                     boolean flag = !livingEntity.isDiscrete();
                     int y = "deadmau5".equals(displayName.getString()) ? -10 : 0;
@@ -90,15 +99,15 @@ public class LimbusCraftClientNeoForge {
 
                     TextureAtlasSprite textureatlassprite = LimbusCraftClient.tokenTextureManager.get(token.token());
 
-                    builder.addVertex(matrix4f, width, height, z)
+                    builder.addVertex(matrix4f, width+x, height, z)
                             .setUv(textureatlassprite.getU1(), textureatlassprite.getV0()).setColor(1f, 1f, 1f, 1f)
                             .setLight(packedLight);
-                    builder.addVertex(matrix4f, width, 0, z)
+                    builder.addVertex(matrix4f, width+x, 0, z)
                             .setUv(textureatlassprite.getU1(), textureatlassprite.getV1()).setColor(1f, 1f, 1f, 1f)
                             .setLight(packedLight);
-                    builder.addVertex(matrix4f, 0, 0, z).setUv(textureatlassprite.getU0(), textureatlassprite.getV1())
+                    builder.addVertex(matrix4f, x, 0, z).setUv(textureatlassprite.getU0(), textureatlassprite.getV1())
                             .setColor(1f, 1f, 1f, 1f).setLight(packedLight);
-                    builder.addVertex(matrix4f, 0, height, z)
+                    builder.addVertex(matrix4f, x, height, z)
                             .setUv(textureatlassprite.getU0(), textureatlassprite.getV0())
                             .setColor(1f, 1f, 1f, 1f).setLight(packedLight);
 
@@ -110,9 +119,9 @@ public class LimbusCraftClientNeoForge {
                         String potency = token.potency()+"";
                         String count = token.count()+"";
 
-                        float xTextP = 8 - font.width(potency);
+                        float xTextP =  x / .025f +8 - font.width(potency);
                         float yText = -8;
-                        float xTextC = 32;
+                        float xTextC = x/ .025f+32;
 
                      //   font.drawInBatch(
                       //          potency, xText, yText, 0x20ffffff, false, matrix4f, bufferSource, flag ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, j, packedLight
@@ -123,9 +132,9 @@ public class LimbusCraftClientNeoForge {
                             font.drawInBatch(count, xTextC, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, light);
                         }
 
-
+                        poseStack.popPose();
+                        i++;
                     }
-                    poseStack.popPose();
                 }
             }
         }
