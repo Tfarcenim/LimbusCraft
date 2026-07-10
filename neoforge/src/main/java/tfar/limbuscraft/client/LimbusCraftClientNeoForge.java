@@ -118,8 +118,9 @@ public class LimbusCraftClientNeoForge {
                       //          potency, xText, yText, 0x20ffffff, false, matrix4f, bufferSource, flag ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, j, packedLight
                      //   );
                         if (true) {
-                            font.drawInBatch(potency, xTextP, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
-                            font.drawInBatch(count, xTextC, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
+                            final int light = 0xF000F0;
+                            font.drawInBatch(potency, xTextP, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, light);
+                            font.drawInBatch(count, xTextC, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, light);
                         }
 
 

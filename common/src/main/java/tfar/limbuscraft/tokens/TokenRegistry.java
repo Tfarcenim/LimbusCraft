@@ -17,6 +17,7 @@ public class TokenRegistry {
             TOKENS::get, Token::id);
 
     public static final Token BURN = register(new BurnBane());
+    public static final Token BLEED = register(new BleedBane());
 
     static<T extends Token> T register(T token) {
         TOKENS.put(token.id(), token);

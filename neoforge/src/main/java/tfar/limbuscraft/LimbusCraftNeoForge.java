@@ -5,13 +5,11 @@ import com.mojang.brigadier.ParseResults;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.EventPriority;
@@ -22,16 +20,22 @@ import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.datagen.LimbusDatagen;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
 import tfar.limbuscraft.mixin.DefaultAttributesAccess;
 import tfar.limbuscraft.mixin.EntityAttributeModificationEventAccess;
 import tfar.limbuscraft.tags.LimbusDamageTypeTags;
+import tfar.limbuscraft.tokens.Token;
+import tfar.limbuscraft.tokens.TokenInstance;
+import tfar.limbuscraft.tokens.TokenRegistry;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Mod(LimbusCraft.MOD_ID)
@@ -47,11 +51,12 @@ public class LimbusCraftNeoForge {
 
         // Use NeoForge to bootstrap the Common mod.
         LimbusCraft.init();
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST,this::livingDamage);
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST,this::livingIncomingDamage);
         NeoForge.EVENT_BUS.addListener(this::commands);
         NeoForge.EVENT_BUS.addListener(this::onCommand);
         NeoForge.EVENT_BUS.addListener(this::controlTeleport);
         NeoForge.EVENT_BUS.addListener(this::entityTick);
+        NeoForge.EVENT_BUS.addListener(this::livingDamagePost);
     }
 
     void entityTick(EntityTickEvent.Post event) {
@@ -96,10 +101,22 @@ public class LimbusCraftNeoForge {
         LimbusCommands.register(event.getDispatcher());
     }
 
-    void livingDamage(LivingIncomingDamageEvent event) {
+    void livingIncomingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (!source.is(LimbusDamageTypeTags.LIMBUS)) {
             event.setAmount(event.getAmount() * 5);
+        }
+    }
+
+    void livingDamagePost(LivingDamageEvent.Post event) {
+        DamageSource source = event.getSource();
+        Entity attacker = source.getEntity();
+        if (attacker instanceof LivingEntity livingAttacker) {
+            Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(livingAttacker);
+            TokenInstance tokenInstance = tokens.get(TokenRegistry.BLEED);
+            if (tokenInstance != null) {
+                tokenInstance.tick(livingAttacker);
+            }
         }
     }
 
