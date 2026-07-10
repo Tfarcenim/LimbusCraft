@@ -5,6 +5,7 @@ import tfar.limbuscraft.platform.Services;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DataAttachmentUtil {
@@ -21,14 +22,20 @@ public class DataAttachmentUtil {
         return Services.PLATFORM.getAttachedValue(entity,CommonDataAttachments.TOKENS);
     }
 
+    public static void setTokens(LivingEntity entity, Map<Token, TokenInstance> tokens) {
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.TOKENS, tokens);
+    }
+
     public static void addOrReplaceToken(LivingEntity entity, TokenInstance token) {
-        Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(entity);
+        Map<Token, TokenInstance> tokens = new HashMap<>(DataAttachmentUtil.getTokens(entity));
         tokens.put(token.token(),token);
+        setTokens(entity,tokens);
     }
 
     public static void removeToken(LivingEntity entity, Token token) {
-        Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(entity);
+        Map<Token, TokenInstance> tokens = new HashMap<>(DataAttachmentUtil.getTokens(entity));
         tokens.remove(token);
+        setTokens(entity,tokens);
     }
 
     public static void clearTokens(LivingEntity entity) {

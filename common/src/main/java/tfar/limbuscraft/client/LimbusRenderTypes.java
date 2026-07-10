@@ -5,11 +5,12 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import tfar.limbuscraft.LimbusCraft;
 
 public class LimbusRenderTypes extends RenderStateShard {
 
     protected static final RenderStateShard.TextureStateShard TOKEN_SHEET = new RenderStateShard.TextureStateShard(
-            ResourceLocation.withDefaultNamespace("textures/atlas/mob_effects.png"), false, false);
+            LimbusCraft.id("textures/atlas/tokens.png"), false, false);
 
     public static final RenderType TOKEN = getTokenType();
 

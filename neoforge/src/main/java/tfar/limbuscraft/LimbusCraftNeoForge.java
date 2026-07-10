@@ -5,6 +5,7 @@ import com.mojang.brigadier.ParseResults;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -24,9 +25,11 @@ import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import tfar.limbuscraft.datagen.LimbusDatagen;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
 import tfar.limbuscraft.mixin.DefaultAttributesAccess;
 import tfar.limbuscraft.mixin.EntityAttributeModificationEventAccess;
+import tfar.limbuscraft.tags.LimbusDamageTypeTags;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +40,7 @@ public class LimbusCraftNeoForge {
     public LimbusCraftNeoForge(IEventBus eventBus) {
         eventBus.addListener(this::attributeSetup);
         eventBus.addListener(this::register);
+        eventBus.addListener(LimbusDatagen::gather);
         // This method is invoked by the NeoForge mod loader when it is ready
         // to load your mod. You can access NeoForge and Common code in this
         // project.
@@ -94,7 +98,7 @@ public class LimbusCraftNeoForge {
 
     void livingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
-        if (true) {
+        if (!source.is(LimbusDamageTypeTags.LIMBUS)) {
             event.setAmount(event.getAmount() * 5);
         }
     }

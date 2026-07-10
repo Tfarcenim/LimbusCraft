@@ -55,7 +55,9 @@ public class LimbusCommands {
                                                         (context, builder) ->
                                                                 SharedSuggestionProvider.suggest(TokenRegistry.TOKENS.keySet(),builder)
                                                 ).then(Commands.argument("potency", IntegerArgumentType.integer(1))
-                                                        .executes(LimbusCommands::addTokenToTargets)
+                                                        .then(Commands.argument("count", IntegerArgumentType.integer(1))
+                                                                .executes(LimbusCommands::addTokenToTargets)
+                                                        )
                                                 )
                                         )
                                 )
@@ -105,7 +107,8 @@ public class LimbusCommands {
         }
         Collection<? extends Entity> targets = EntityArgument.getEntities(ctx,"targets");
         int potency = IntegerArgumentType.getInteger(ctx, "potency");
-        TokenInstance tokenInstance = new TokenInstance(token,potency);
+        int count  = IntegerArgumentType.getInteger(ctx, "count");
+        TokenInstance tokenInstance = new TokenInstance(token,potency,count);
         for (Entity target : targets) {
             if (target instanceof LivingEntity livingTarget) {
                 DataAttachmentUtil.addOrReplaceToken(livingTarget, tokenInstance);

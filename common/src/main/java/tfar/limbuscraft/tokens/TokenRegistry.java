@@ -16,9 +16,9 @@ public class TokenRegistry {
     public static final StreamCodec<ByteBuf,Token> TOKEN_STREAM_CODEC = ByteBufCodecs.STRING_UTF8.map(
             TOKENS::get, Token::id);
 
-    public static final Token BURN = register(new Token("burn",TokenType.BANE));
+    public static final Token BURN = register(new BurnBane());
 
-    static Token register(Token token) {
+    static<T extends Token> T register(T token) {
         TOKENS.put(token.id(), token);
         return token;
     }

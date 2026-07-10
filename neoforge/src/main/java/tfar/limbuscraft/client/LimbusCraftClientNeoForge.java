@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -19,6 +20,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -40,8 +42,13 @@ public class LimbusCraftClientNeoForge {
         bus.addListener(this::setup);
         bus.addListener(this::registerOverlay);
         NeoForge.EVENT_BUS.addListener(this::renderOverlayEvent);
-
+        bus.addListener(this::reloadListener);
         //NeoForge.EVENT_BUS.addListener(this::renderAboveNameTag);
+    }
+
+    void reloadListener(RegisterClientReloadListenersEvent event) {
+        LimbusCraftClient.reloadListeners();
+        event.registerReloadListener(LimbusCraftClient.tokenTextureManager);
     }
 
     /**
@@ -68,7 +75,7 @@ public class LimbusCraftClientNeoForge {
 
                     poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
                    // poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-                    //for (TokenInstance token : tokens) {
+                    for (TokenInstance token : tokens.values()) {
                     Component displayName = livingEntity.getDisplayName();//todo use event?
                     boolean flag = !livingEntity.isDiscrete();
                     int y = "deadmau5".equals(displayName.getString()) ? -10 : 0;
@@ -77,12 +84,11 @@ public class LimbusCraftClientNeoForge {
 
                     float width = 1;
                     float height = 1;
-                    float z = 0.0001f;
+                    float z = -0.0001f;
 
                     VertexConsumer builder = bufferSource.getBuffer(LimbusRenderTypes.TOKEN);
 
-                    MobEffectTextureManager mobeffecttexturemanager = Minecraft.getInstance().getMobEffectTextures();
-                    TextureAtlasSprite textureatlassprite = mobeffecttexturemanager.get(MobEffects.POISON);
+                    TextureAtlasSprite textureatlassprite = LimbusCraftClient.tokenTextureManager.get(token.token());
 
                     builder.addVertex(matrix4f, width, height, z)
                             .setUv(textureatlassprite.getU1(), textureatlassprite.getV0()).setColor(1f, 1f, 1f, 1f)
@@ -96,8 +102,28 @@ public class LimbusCraftClientNeoForge {
                             .setUv(textureatlassprite.getU0(), textureatlassprite.getV0())
                             .setColor(1f, 1f, 1f, 1f).setLight(packedLight);
 
+                        poseStack.scale(0.025F, -0.025F, 0.025F);
+                        float f = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
+                        int j = (int)(f * 255.0F) << 24;
+                        Font font = Minecraft.getInstance().font;
 
-                    //  }
+                        String potency = token.potency()+"";
+                        String count = token.count()+"";
+
+                        float xTextP = 8 - font.width(potency);
+                        float yText = -8;
+                        float xTextC = 32;
+
+                     //   font.drawInBatch(
+                      //          potency, xText, yText, 0x20ffffff, false, matrix4f, bufferSource, flag ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, j, packedLight
+                     //   );
+                        if (true) {
+                            font.drawInBatch(potency, xTextP, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
+                            font.drawInBatch(count, xTextC, yText, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
+                        }
+
+
+                    }
                     poseStack.popPose();
                 }
             }

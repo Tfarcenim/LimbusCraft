@@ -13,7 +13,11 @@ import tfar.limbuscraft.init.LimbusBlocks;
 import tfar.limbuscraft.init.LimbusItems;
 import tfar.limbuscraft.init.LimbusMenuTypes;
 import tfar.limbuscraft.platform.Services;
+import tfar.limbuscraft.tokens.Token;
+import tfar.limbuscraft.tokens.TokenInstance;
 import tfar.limbuscraft.world.LimbusTableMenu;
+
+import java.util.Map;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -65,6 +69,15 @@ public class LimbusCraft {
             if (combatTracker.inCombat) {
                 //- While in combat, every 10 second all involved parties will gain 5 SP (unless they toggle this in the Limbus table)
                 int duration = combatTracker.getCombatDuration();
+
+                Map<Token, TokenInstance> tokenMap = DataAttachmentUtil.getTokens(livingEntity);
+
+                for (TokenInstance token : tokenMap.values()) {
+                    if (token.shouldTick(duration)) {
+                        token.tick(livingEntity);
+                    }
+                }
+
                 if (duration % 200 == 0) {
                     DataAttachmentUtil.setSanity(livingEntity,DataAttachmentUtil.getSanity(livingEntity)+5);
                 }
