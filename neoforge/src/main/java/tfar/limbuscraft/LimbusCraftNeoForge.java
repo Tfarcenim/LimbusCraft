@@ -3,6 +3,7 @@ package tfar.limbuscraft;
 
 import com.mojang.brigadier.ParseResults;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -70,7 +71,7 @@ public class LimbusCraftNeoForge {
         CommandSourceStack source = parseResults.getContext().getSource();
         if (source.getEntity() instanceof ServerPlayer serverPlayer) {
             boolean inCombat = serverPlayer.getCombatTracker().inCombat;
-            if (inCombat && !serverPlayer.getAbilities().instabuild) {
+            if (inCombat && !serverPlayer.getAbilities().instabuild && !serverPlayer.hasPermissions(Commands.LEVEL_MODERATORS)) {
                 event.setCanceled(true);
                 serverPlayer.sendSystemMessage(Component.literal("Can't use that command in combat"));
             }

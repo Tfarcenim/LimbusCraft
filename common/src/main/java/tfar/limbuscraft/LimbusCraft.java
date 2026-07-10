@@ -3,6 +3,7 @@ package tfar.limbuscraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.CombatTracker;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
@@ -81,6 +82,21 @@ public class LimbusCraft {
                 if (duration % 200 == 0) {
                     DataAttachmentUtil.setSanity(livingEntity,DataAttachmentUtil.getSanity(livingEntity)+5);
                 }
+            }
+        }
+    }
+
+    //mark the other participant as in combat
+    public static void onRecordDamage(CombatTracker combatTracker, DamageSource source) {
+        if (source.getEntity() instanceof LivingEntity livingAttacker) {
+            CombatTracker attackTracker = livingAttacker.getCombatTracker();
+            if (!attackTracker.inCombat) {
+                attackTracker.inCombat = true;
+                attackTracker.takingDamage = true;
+                attackTracker.lastDamageTime = livingAttacker.tickCount;
+                attackTracker.combatStartTime = livingAttacker.tickCount;
+                attackTracker.combatEndTime = attackTracker.combatStartTime;
+                livingAttacker.onEnterCombat();
             }
         }
     }

@@ -22,6 +22,10 @@ public record TokenInstance(Token token, int potency,int count) {
             ByteBufCodecs.INT,TokenInstance::count,
             TokenInstance::new);
 
+    public void onApplied(LivingEntity entity,boolean isNew) {
+
+    }
+
     public TokenInstance increaseCount(int delta) {
         return new TokenInstance(token,potency,count + delta);
     }
