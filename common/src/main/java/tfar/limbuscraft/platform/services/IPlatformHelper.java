@@ -44,6 +44,12 @@ public interface IPlatformHelper {
     @Nullable
     <T> T getAttachedValue(Object object, CommonDataAttachment<T> attachment);
 
+    @Nullable
+    default <T> T getOrDefaultAttachedValue(Object object, CommonDataAttachment<T> attachment,T defaultValue) {
+        T value = getAttachedValue(object, attachment);
+        return value != null ? value : defaultValue;
+    }
+
     default <T> T getOrCreateAttachedValue(Object object, CommonDataAttachment<T> attachment) {
         T value = getAttachedValue(object, attachment);
         if (value != null) {

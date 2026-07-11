@@ -70,13 +70,13 @@ public class LimbusCraftClientNeoForge {
                 Vec3 vec3 = livingEntity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, livingEntity.getViewYRot(partialTick));
                 if (vec3 != null) {
                     Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(livingEntity);
-                    float w = 1;
-                    float labelWidth =1;
-                    float xStart = -tokens.size() * w / 2;
-                    float scale = 1f;
+                    float padding = .5f;
+                    float xStart = -tokens.size()/2f - padding * (tokens.size()-1)/2f;
+                    float labelWidth = 1;
+                    float scale = .5f;
                     int i = 0;
                     for (TokenInstance token : tokens.values()) {
-                        float x = xStart + i * w;
+                        float x = xStart + i * (padding+1);
                         poseStack.pushPose();
                         poseStack.translate(vec3.x, vec3.y + 0.5, vec3.z);
 

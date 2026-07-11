@@ -21,8 +21,8 @@ public class LimbusDamageTypeTagsProvider extends DamageTypeTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(LimbusDamageTypeTags.LIMBUS)
-                .add(LimbusDamageTypes.WRATH,LimbusDamageTypes.LUST,LimbusDamageTypes.PRIDE);
+                .add(LimbusDamageTypes.WRATH,LimbusDamageTypes.LUST,LimbusDamageTypes.PRIDE,LimbusDamageTypes.SLOTH);
 
-        this.tag(DamageTypeTags.NO_KNOCKBACK).add(LimbusDamageTypes.WRATH,LimbusDamageTypes.LUST,LimbusDamageTypes.PRIDE);
+        this.tag(DamageTypeTags.NO_KNOCKBACK).add(LimbusDamageTypes.WRATH,LimbusDamageTypes.LUST,LimbusDamageTypes.PRIDE,LimbusDamageTypes.SLOTH);
     }
 }

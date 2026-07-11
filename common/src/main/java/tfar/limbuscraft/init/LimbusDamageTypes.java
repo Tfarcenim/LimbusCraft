@@ -10,6 +10,7 @@ import tfar.limbuscraft.LimbusCraft;
 public interface LimbusDamageTypes {
     ResourceKey<DamageType> LUST = create("lust");
     ResourceKey<DamageType> PRIDE = create("pride");
+    ResourceKey<DamageType> SLOTH = create("sloth");
     ResourceKey<DamageType> WRATH = create("wrath");
 
     static ResourceKey<DamageType> create(String name) {
@@ -20,5 +21,6 @@ public interface LimbusDamageTypes {
         context.register(WRATH, new DamageType("burn", 0, DamageEffects.BURNING));
         context.register(LUST, new DamageType("lust", 0, DamageEffects.HURT));
         context.register(PRIDE, new DamageType("pride", 0, DamageEffects.HURT));
+        context.register(SLOTH, new DamageType("sloth", 0, DamageEffects.HURT));
     }
 }

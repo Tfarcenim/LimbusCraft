@@ -41,4 +41,12 @@ public class DataAttachmentUtil {
     public static void clearTokens(LivingEntity entity) {
         Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.TOKENS, CommonDataAttachments.TOKENS.defaultValueSupplier.apply(entity));
     }
+
+    public static int getStaggered(LivingEntity entity) {
+        return Services.PLATFORM.getOrDefaultAttachedValue(entity,CommonDataAttachments.STAGGERED,0);
+    }
+
+    public static void setStaggered(LivingEntity entity, int staggered) {
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.STAGGERED, staggered);
+    }
 }

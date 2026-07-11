@@ -29,6 +29,12 @@ public class CommonDataAttachments {
             .build("tokens")
     );
 
+    public static final CommonDataAttachment<Integer> STAGGERED =
+            register(CommonDataAttachment.create(o -> 0)
+                    .networkSynchronized(ByteBufCodecs.INT)
+                    .codec(Codec.INT)
+                    .build("staggered"));
+
     public static CommonDataAttachment<?> lookup(ResourceLocation location) {
         return MAP.get(location);
     }
