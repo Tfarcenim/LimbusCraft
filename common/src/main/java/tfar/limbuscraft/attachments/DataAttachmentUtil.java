@@ -6,9 +6,14 @@ import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DataAttachmentUtil {
+
+    public static <T> void clearValue(LivingEntity entity,CommonDataAttachment<T> attachment) {
+        Services.PLATFORM.setAttachedValue(entity,attachment, attachment.defaultValueSupplier.apply(entity));
+    }
 
     public static int getSanity(LivingEntity entity) {
         return Services.PLATFORM.getOrCreateAttachedValue(entity,CommonDataAttachments.SANITY);
@@ -39,7 +44,7 @@ public class DataAttachmentUtil {
     }
 
     public static void clearTokens(LivingEntity entity) {
-        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.TOKENS, CommonDataAttachments.TOKENS.defaultValueSupplier.apply(entity));
+        clearValue(entity,CommonDataAttachments.TOKENS);
     }
 
     public static int getStaggered(LivingEntity entity) {
@@ -48,5 +53,13 @@ public class DataAttachmentUtil {
 
     public static void setStaggered(LivingEntity entity, int staggered) {
         Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.STAGGERED, staggered);
+    }
+
+    public static List<Float> getStaggerThresholds(LivingEntity entity) {
+        return Services.PLATFORM.getOrCreateAttachedValue(entity,CommonDataAttachments.STAGGER_THRESHOLDS);
+    }
+
+    public static void setStaggerThresholds(LivingEntity entity, List<Float> staggerThresholds) {
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.STAGGER_THRESHOLDS, staggerThresholds);
     }
 }

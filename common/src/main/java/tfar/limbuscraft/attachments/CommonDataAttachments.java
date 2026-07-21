@@ -29,6 +29,12 @@ public class CommonDataAttachments {
             .build("tokens")
     );
 
+    public static final CommonDataAttachment<List<Float>> STAGGER_THRESHOLDS =
+            register(CommonDataAttachment.<List<Float>>create(o -> List.of())
+                    .networkSynchronized(ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list()))
+                    .codec(Codec.FLOAT.listOf())
+                    .build("stagger_thresholds"));
+
     public static final CommonDataAttachment<Integer> STAGGERED =
             register(CommonDataAttachment.create(o -> 0)
                     .networkSynchronized(ByteBufCodecs.INT)

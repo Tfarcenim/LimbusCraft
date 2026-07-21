@@ -6,9 +6,11 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CombatTrackerMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "MobMixin"
   ],
   "client": [
+    "LivingEntityRendererMixin"
   ],
   "server": [],
   "injectors": {

@@ -2,6 +2,7 @@ package tfar.limbuscraft;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,6 +19,7 @@ import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 import tfar.limbuscraft.world.LimbusTableMenu;
 
+import java.util.List;
 import java.util.Map;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
@@ -59,6 +61,17 @@ public class LimbusCraft {
     public static void onEnterCombat(LivingEntity livingEntity) {
         if (DEBUG && livingEntity instanceof Player player) {
             player.sendSystemMessage(Component.literal("Entered Combat"));
+        }
+        computeStaggerThresholds(livingEntity);
+    }
+
+    public static void computeStaggerThresholds(LivingEntity entity) {
+        RandomSource random = entity.getRandom();
+        float maxHealth = entity.getMaxHealth();
+        if (maxHealth <= 100) {
+            float fraction = .15f + .70f * random.nextFloat();
+            float threshold = maxHealth * fraction;
+            DataAttachmentUtil.setStaggerThresholds(entity, List.of(threshold));
         }
     }
 
