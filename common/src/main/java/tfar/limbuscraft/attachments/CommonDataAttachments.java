@@ -41,6 +41,13 @@ public class CommonDataAttachments {
                     .codec(Codec.INT)
                     .build("staggered"));
 
+
+    public static final CommonDataAttachment<Integer> STAGGER_TIMER =
+            register(CommonDataAttachment.create(o -> 0)
+                    .networkSynchronized(ByteBufCodecs.INT)
+                    .codec(Codec.INT)
+                    .build("stagger_timer"));
+
     public static CommonDataAttachment<?> lookup(ResourceLocation location) {
         return MAP.get(location);
     }

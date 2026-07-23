@@ -62,4 +62,12 @@ public class DataAttachmentUtil {
     public static void setStaggerThresholds(LivingEntity entity, List<Float> staggerThresholds) {
         Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.STAGGER_THRESHOLDS, staggerThresholds);
     }
+
+    public static int getStaggerTimer(LivingEntity entity) {
+        return Services.PLATFORM.getOrDefaultAttachedValue(entity,CommonDataAttachments.STAGGER_TIMER,0);
+    }
+
+    public static void setStaggerTimer(LivingEntity entity, int staggerTimer) {
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.STAGGER_TIMER, staggerTimer);
+    }
 }

@@ -1,24 +1,25 @@
 package tfar.limbuscraft;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.damagesource.CombatTracker;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tfar.limbuscraft.attachments.CommonDataAttachments;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
+import tfar.limbuscraft.ducks.LivingEntityDuck;
 import tfar.limbuscraft.init.LimbusBlocks;
 import tfar.limbuscraft.init.LimbusItems;
 import tfar.limbuscraft.init.LimbusMenuTypes;
 import tfar.limbuscraft.platform.Services;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
-import tfar.limbuscraft.world.LimbusTableMenu;
+import tfar.limbuscraft.world.LimbusCombatTracker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,38 +52,14 @@ public class LimbusCraft {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
     }
 
-    public static void onLeaveCombat(LivingEntity livingEntity) {
-        DataAttachmentUtil.setSanity(livingEntity,0);
-        if (DEBUG && livingEntity instanceof Player player) {
-            player.sendSystemMessage(Component.literal("Left Combat"));
-        }
-    }
-
-    public static void onEnterCombat(LivingEntity livingEntity) {
-        if (DEBUG && livingEntity instanceof Player player) {
-            player.sendSystemMessage(Component.literal("Entered Combat"));
-        }
-        computeStaggerThresholds(livingEntity);
-    }
-
-    public static void computeStaggerThresholds(LivingEntity entity) {
-        RandomSource random = entity.getRandom();
-        float maxHealth = entity.getMaxHealth();
-        if (maxHealth <= 100) {
-            float fraction = .15f + .70f * random.nextFloat();
-            float threshold = maxHealth * fraction;
-            DataAttachmentUtil.setStaggerThresholds(entity, List.of(threshold));
-        }
-    }
-
     public static void entityTick(LivingEntity livingEntity) {
         if (livingEntity.level().isClientSide) {
 
         } else {
-            CombatTracker combatTracker = livingEntity.getCombatTracker();
+            LimbusCombatTracker combatTracker = ((LivingEntityDuck)livingEntity).getLimbusCombatTracker();
             if (combatTracker.inCombat) {
                 //- While in combat, every 10 second all involved parties will gain 5 SP (unless they toggle this in the Limbus table)
-                int duration = combatTracker.getCombatDuration();
+                long duration = combatTracker.getDuration();
 
                 Map<Token, TokenInstance> tokenMap = DataAttachmentUtil.getTokens(livingEntity);
 
@@ -99,18 +76,31 @@ public class LimbusCraft {
         }
     }
 
-    //mark the other participant as in combat
-    public static void onRecordDamage(CombatTracker combatTracker, DamageSource source) {
-        if (source.getEntity() instanceof LivingEntity livingAttacker) {
-            CombatTracker attackTracker = livingAttacker.getCombatTracker();
-            if (!attackTracker.inCombat) {
-                attackTracker.inCombat = true;
-                attackTracker.takingDamage = true;
-                attackTracker.lastDamageTime = livingAttacker.tickCount;
-                attackTracker.combatStartTime = livingAttacker.tickCount;
-                attackTracker.combatEndTime = attackTracker.combatStartTime;
-                livingAttacker.onEnterCombat();
-            }
+    public static void computeStaggerThresholds(LivingEntity entity) {
+        RandomSource random = entity.getRandom();
+        float maxHealth = entity.getMaxHealth();
+        int staggerLines = Math.min(5,(int)Math.ceil(maxHealth / 100));
+        List<Float> staggerThresholds = new ArrayList<>();
+        for (int i = 0; i < staggerLines; i++) {
+            float sectionMin =  (float) i / staggerLines;
+            float sectionMax = (float) (i+1) / staggerLines;
+
+            float fraction = .15f + .70f * random.nextFloat();
+
+            float sectionPos = sectionMin + (sectionMax - sectionMin) * fraction;
+
+            float threshold = sectionPos * maxHealth;
+            staggerThresholds.add(threshold);
         }
+
+        if (DEBUG) {
+            entity.getServer().getPlayerList().broadcastAll(new ClientboundSystemChatPacket(
+                    Component.literal("Stagger thresholds for ")
+                            .append(entity.getName()).append(" ")
+                            .append(staggerThresholds.toString()
+                    ),false));
+        }
+
+        DataAttachmentUtil.setStaggerThresholds(entity, staggerThresholds);
     }
 }

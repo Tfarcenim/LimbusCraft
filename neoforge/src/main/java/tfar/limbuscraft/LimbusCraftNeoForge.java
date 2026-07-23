@@ -42,6 +42,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.datagen.LimbusDatagen;
+import tfar.limbuscraft.ducks.LivingEntityDuck;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
 import tfar.limbuscraft.mixin.DefaultAttributesAccess;
 import tfar.limbuscraft.mixin.EntityAttributeModificationEventAccess;
@@ -49,6 +50,7 @@ import tfar.limbuscraft.tags.LimbusDamageTypeTags;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 import tfar.limbuscraft.tokens.TokenRegistry;
+import tfar.limbuscraft.world.LimbusCombatTracker;
 
 import java.util.HashSet;
 import java.util.List;
@@ -79,7 +81,8 @@ public class LimbusCraftNeoForge {
 
     void entityTickPre(EntityTickEvent.Pre event) {
         if (event.getEntity() instanceof LivingEntity livingEntity) {
-
+            LimbusCombatTracker limbusCombatTracker = ((LivingEntityDuck)livingEntity).getLimbusCombatTracker();
+            limbusCombatTracker.tick();
         }
     }
 
@@ -158,9 +161,21 @@ public class LimbusCraftNeoForge {
 
     void livingIncomingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
+        LivingEntity entity = event.getEntity();
         if (!source.is(LimbusDamageTypeTags.LIMBUS)) {
             event.setAmount(event.getAmount() * 5);
         }
+
+        int staggerCount = DataAttachmentUtil.getStaggered(entity);
+        if (staggerCount > 0) {
+            float multiplier = 1;
+            if (staggerCount == 1) {multiplier = 1.2F;}
+            else if (staggerCount == 2) {multiplier = 1.5F;}
+            else if (staggerCount >= 3) {multiplier = 2;}
+            event.setAmount(event.getAmount() * multiplier);
+        }
+
+        ((LivingEntityDuck)event.getEntity()).getLimbusCombatTracker().onHit(source);
     }
 
     void livingDamagePost(LivingDamageEvent.Post event) {
@@ -178,6 +193,8 @@ public class LimbusCraftNeoForge {
     }
 
     void checkForStagger(LivingEntity livingEntity, float damage) {
+        int staggeredCount = DataAttachmentUtil.getStaggered(livingEntity);
+        if (staggeredCount > 0) {return;}
         float lowerBound = livingEntity.getHealth();
         float upperBound = livingEntity.getHealth() + damage;
         List<Float> staggerThresholds = DataAttachmentUtil.getStaggerThresholds(livingEntity);
@@ -188,7 +205,8 @@ public class LimbusCraftNeoForge {
             }
         }
         if (staggerCount > 0) {
-            LimbusCraft.LOG.info("{} is staggered {} times", livingEntity.getName(), staggerCount);
+            LimbusCombatTracker.LOG.info("{} is staggered {} times", livingEntity.getName(), staggerCount);
+            DataAttachmentUtil.setStaggerTimer(livingEntity, 120);
         }
         DataAttachmentUtil.setStaggered(livingEntity, staggerCount);
     }
