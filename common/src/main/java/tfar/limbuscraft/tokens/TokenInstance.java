@@ -30,6 +30,11 @@ public record TokenInstance(Token token, int potency,int count) {
         return new TokenInstance(token,potency,count + delta);
     }
 
+    public TokenInstance withCount(int delta) {
+        return new TokenInstance(token,potency,delta);
+    }
+
+
     public boolean shouldTick(long combatTimer) {
         return token.shouldTick(combatTimer);
     }

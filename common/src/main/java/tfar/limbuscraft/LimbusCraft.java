@@ -17,8 +17,10 @@ import tfar.limbuscraft.init.LimbusMenuTypes;
 import tfar.limbuscraft.platform.Services;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
+import tfar.limbuscraft.tokens.TokenRegistry;
 import tfar.limbuscraft.world.LimbusCombatTracker;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,9 +78,45 @@ public class LimbusCraft {
         }
     }
 
+    public static void triggerTremorBurst(LivingEntity livingEntity,int triggerTimes) {
+        TokenInstance tokenInstance = DataAttachmentUtil.getTokens(livingEntity).get(TokenRegistry.TREMOR);
+        if (tokenInstance != null) {
+            int stack = tokenInstance.count();
+            int actualTriggerCount = Math.min(stack, triggerTimes);
+            int remainderStack = stack - actualTriggerCount;
+
+            if (remainderStack > 0) {
+                DataAttachmentUtil.addOrReplaceToken(livingEntity,tokenInstance.withCount(remainderStack));
+            } else {
+                DataAttachmentUtil.removeToken(livingEntity,TokenRegistry.TREMOR);
+            }
+
+            List<Float> staggerThresholds = DataAttachmentUtil.getStaggerThresholds(livingEntity);
+            List<Float> newStaggerThresholds = new ArrayList<>();
+            float currentHealth = livingEntity.getHealth();
+            int staggerCount = 0;
+            for (int i = 0; i < staggerThresholds.size(); i++) {
+                float staggerThreshold = staggerThresholds.get(i);
+                if (staggerCount + actualTriggerCount > currentHealth) {
+                    staggerCount++;
+                } else {
+                    newStaggerThresholds.add(i, staggerThreshold + actualTriggerCount);
+                }
+            }
+
+            if (staggerCount > 0) {
+                LimbusCombatTracker.LOG.info("{} is staggered {} times", livingEntity.getName(), staggerCount);
+                DataAttachmentUtil.setStaggerTimer(livingEntity, 120);
+            }
+
+            DataAttachmentUtil.setStaggerThresholds(livingEntity, newStaggerThresholds);
+        }
+    }
+
     public static void computeStaggerThresholds(LivingEntity entity) {
         RandomSource random = entity.getRandom();
         float maxHealth = entity.getMaxHealth();
+        float currentHealth = entity.getHealth();
         int staggerLines = Math.min(5,(int)Math.ceil(maxHealth / 100));
         List<Float> staggerThresholds = new ArrayList<>();
         for (int i = 0; i < staggerLines; i++) {
@@ -90,6 +128,19 @@ public class LimbusCraft {
             float sectionPos = sectionMin + (sectionMax - sectionMin) * fraction;
 
             float threshold = sectionPos * maxHealth;
+
+            if (threshold >= currentHealth) {
+                if (DEBUG) {
+                    entity.getServer().getPlayerList().broadcastAll(new ClientboundSystemChatPacket(
+                            Component.literal("Skipping stagger threshold at ")
+                                    .append(threshold + "")
+                                    .append(" for ")
+                                    .append(entity.getName())
+                            , false));
+                }
+                continue;
+            }
+
             staggerThresholds.add(threshold);
         }
 
@@ -102,5 +153,35 @@ public class LimbusCraft {
         }
 
         DataAttachmentUtil.setStaggerThresholds(entity, staggerThresholds);
+    }
+
+    public static void checkForStagger(LivingEntity livingEntity, float damage) {
+        int staggeredCount = DataAttachmentUtil.getStaggered(livingEntity);
+        if (staggeredCount > 0) {return;}
+        float lowerBound = livingEntity.getHealth();
+        float upperBound = livingEntity.getHealth() + damage;
+        List<Float> staggerThresholds = DataAttachmentUtil.getStaggerThresholds(livingEntity);
+        int staggerCount = 0;
+        for (float staggerThreshold : staggerThresholds) {
+            if (lowerBound <= staggerThreshold && upperBound >= staggerThreshold) {
+                staggerCount++;
+            }
+        }
+        if (staggerCount > 0) {
+            LimbusCombatTracker.LOG.info("{} is staggered {} times", livingEntity.getName(), staggerCount);
+            DataAttachmentUtil.setStaggerTimer(livingEntity, 120);
+            removeStaggerThresholds(livingEntity,staggerCount);
+        }
+        DataAttachmentUtil.setStaggered(livingEntity, staggerCount);
+    }
+
+    public static void removeStaggerThresholds(LivingEntity livingEntity,int count) {
+        List<Float> staggerThresholds = DataAttachmentUtil.getStaggerThresholds(livingEntity);
+        for (int i = 0; i < count; i++) {
+            if (!staggerThresholds.isEmpty()) {
+                staggerThresholds.removeLast();
+            }
+        }
+        DataAttachmentUtil.setStaggerThresholds(livingEntity, staggerThresholds);
     }
 }

@@ -24,7 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ShovelItem;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -53,7 +53,6 @@ import tfar.limbuscraft.tokens.TokenRegistry;
 import tfar.limbuscraft.world.LimbusCombatTracker;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -155,6 +154,12 @@ public class LimbusCraftNeoForge {
         CompoundTag attachmentTag = compoundtag.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY);
         ResourceLocation resourceLocation = attachmentType.key().location();
         Tag tag = attachmentTag.get(resourceLocation.toString());
+
+        if (tag == null) {
+            context.getSource().sendFailure(Component.literal("Attachment "+resourceLocation+" not found"));
+            return 0;
+        }
+
         context.getSource().sendSuccess(() -> accessor.getPrintSuccess(tag), false);
         return 1;
     }
@@ -182,33 +187,17 @@ public class LimbusCraftNeoForge {
         DamageSource source = event.getSource();
         Entity attacker = source.getEntity();
         LivingEntity target = event.getEntity();
-        checkForStagger(target, event.getNewDamage());
+        LimbusCraft.checkForStagger(target, event.getNewDamage());
         if (attacker instanceof LivingEntity livingAttacker) {
             Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(livingAttacker);
             TokenInstance tokenInstance = tokens.get(TokenRegistry.BLEED);
             if (tokenInstance != null) {
                 tokenInstance.tick(livingAttacker);
             }
-        }
-    }
-
-    void checkForStagger(LivingEntity livingEntity, float damage) {
-        int staggeredCount = DataAttachmentUtil.getStaggered(livingEntity);
-        if (staggeredCount > 0) {return;}
-        float lowerBound = livingEntity.getHealth();
-        float upperBound = livingEntity.getHealth() + damage;
-        List<Float> staggerThresholds = DataAttachmentUtil.getStaggerThresholds(livingEntity);
-        int staggerCount = 0;
-        for (float staggerThreshold : staggerThresholds) {
-            if (lowerBound <= staggerThreshold && upperBound >= staggerThreshold) {
-                staggerCount++;
+            if (livingAttacker.getMainHandItem().getItem() instanceof ShovelItem) {
+                LimbusCraft.triggerTremorBurst(target,1);
             }
         }
-        if (staggerCount > 0) {
-            LimbusCombatTracker.LOG.info("{} is staggered {} times", livingEntity.getName(), staggerCount);
-            DataAttachmentUtil.setStaggerTimer(livingEntity, 120);
-        }
-        DataAttachmentUtil.setStaggered(livingEntity, staggerCount);
     }
 
     void attributeSetup(EntityAttributeModificationEvent event) {
