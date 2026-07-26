@@ -46,7 +46,11 @@ public class Token {
 
     }
 
-    public boolean shouldTick(long combatTimer) {
+    public boolean shouldTick(LivingEntity entity, long combatTimer) {
         return false;
+    }
+
+    public void trigger(LivingEntity livingEntity, TokenInstance tokenInstance) {
+
     }
 }

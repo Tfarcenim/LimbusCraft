@@ -3,7 +3,6 @@ package tfar.limbuscraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import tfar.limbuscraft.tokens.TokenInstance;
 import tfar.limbuscraft.tokens.TokenRegistry;
 import tfar.limbuscraft.world.LimbusCombatTracker;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +64,7 @@ public class LimbusCraft {
                 Map<Token, TokenInstance> tokenMap = DataAttachmentUtil.getTokens(livingEntity);
 
                 for (TokenInstance token : tokenMap.values()) {
-                    if (token.shouldTick(duration)) {
+                    if (token.shouldTick(livingEntity, duration)) {
                         token.tick(livingEntity);
                     }
                 }

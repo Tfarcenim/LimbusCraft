@@ -18,6 +18,7 @@ import net.minecraft.server.commands.data.DataAccessor;
 import net.minecraft.server.commands.data.DataCommands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,6 +44,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.datagen.LimbusDatagen;
 import tfar.limbuscraft.ducks.LivingEntityDuck;
+import tfar.limbuscraft.init.LimbusDamageTypes;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
 import tfar.limbuscraft.mixin.DefaultAttributesAccess;
 import tfar.limbuscraft.mixin.EntityAttributeModificationEventAccess;
@@ -60,7 +62,7 @@ import java.util.Set;
 public class LimbusCraftNeoForge {
 
     public LimbusCraftNeoForge(IEventBus eventBus) {
-        eventBus.addListener(this::attributeSetup);
+        eventBus.addListener(EventPriority.LOW,this::attributeSetup);
         eventBus.addListener(this::register);
         eventBus.addListener(LimbusDatagen::gather);
         // This method is invoked by the NeoForge mod loader when it is ready
@@ -198,6 +200,14 @@ public class LimbusCraftNeoForge {
                 LimbusCraft.triggerTremorBurst(target,1);
             }
         }
+        Map<Token,TokenInstance> tokens = DataAttachmentUtil.getTokens(target);
+        TokenInstance tokenInstance = tokens.get(TokenRegistry.RUPTURE);
+        if  (tokenInstance != null) {
+            if (source.is(LimbusDamageTypeTags.PHYSICAL)) {
+                DataAttachmentUtil.setRuptureTimer(target,LimbusStats.DEFAULT_RUPTURE_TIMER);
+                tokenInstance.trigger(target);
+            }
+        }
     }
 
     void attributeSetup(EntityAttributeModificationEvent event) {
@@ -224,7 +234,5 @@ public class LimbusCraftNeoForge {
             AttributeSupplier value = entry.getValue();
             event.add(key, Attributes.MAX_HEALTH, value.getBaseValue(Attributes.MAX_HEALTH) * 5);
         }
-
-
     }
 }

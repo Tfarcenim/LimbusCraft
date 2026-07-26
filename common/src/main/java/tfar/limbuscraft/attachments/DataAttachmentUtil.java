@@ -70,4 +70,12 @@ public class DataAttachmentUtil {
     public static void setStaggerTimer(LivingEntity entity, int staggerTimer) {
         Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.STAGGER_TIMER, staggerTimer);
     }
+
+    public static int getRuptureTimer(LivingEntity entity) {
+        return Services.PLATFORM.getOrDefaultAttachedValue(entity,CommonDataAttachments.RUPTURE_TIMER,0);
+    }
+
+    public static void setRuptureTimer(LivingEntity entity, int staggerTimer) {
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.RUPTURE_TIMER, staggerTimer);
+    }
 }

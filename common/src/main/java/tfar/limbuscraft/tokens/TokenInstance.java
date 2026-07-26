@@ -6,6 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.LivingEntity;
+import tfar.limbuscraft.attachments.DataAttachmentUtil;
 
 public record TokenInstance(Token token, int potency,int count) {
 
@@ -30,16 +31,32 @@ public record TokenInstance(Token token, int potency,int count) {
         return new TokenInstance(token,potency,count + delta);
     }
 
+    public TokenInstance decrement() {
+        return new TokenInstance(token,potency,count - 1);
+    }
+
     public TokenInstance withCount(int delta) {
         return new TokenInstance(token,potency,delta);
     }
 
 
-    public boolean shouldTick(long combatTimer) {
-        return token.shouldTick(combatTimer);
+    public boolean shouldTick(LivingEntity entity,long combatTimer) {
+        return token.shouldTick(entity,combatTimer);
     }
 
     public void tick(LivingEntity livingEntity) {
         token.tick(livingEntity,this);
+    }
+
+    public void trigger(LivingEntity livingEntity) {
+        token.trigger(livingEntity,this);
+    }
+
+    public void decrementOrRemoveToken(LivingEntity livingEntity) {
+        if (count > 1) {
+            DataAttachmentUtil.addOrReplaceToken(livingEntity,decrement());
+        }  else {
+            DataAttachmentUtil.removeToken(livingEntity,token);
+        }
     }
 }

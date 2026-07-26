@@ -12,7 +12,7 @@ public class BleedBane extends Bane{
 
 
     @Override
-    public boolean shouldTick(long combatTimer) {
+    public boolean shouldTick(LivingEntity entity, long combatTimer) {
         return combatTimer % 160 == 0;
     }
 

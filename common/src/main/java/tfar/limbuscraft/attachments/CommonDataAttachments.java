@@ -21,7 +21,7 @@ public class CommonDataAttachments {
                     .build("sanity"));
 
     public static final CommonDataAttachment<Map<Token,TokenInstance>> TOKENS = register(CommonDataAttachment
-            .<Map<Token,TokenInstance>>create(o -> Map.of())
+            .<Map<Token,TokenInstance>>create(o -> new LinkedHashMap<>())
             .networkSynchronized(ByteBufCodecs.map(
                     LinkedHashMap::new, TokenRegistry.TOKEN_STREAM_CODEC,TokenInstance.STREAM_CODEC
             ))
@@ -47,6 +47,12 @@ public class CommonDataAttachments {
                     .networkSynchronized(ByteBufCodecs.INT)
                     .codec(Codec.INT)
                     .build("stagger_timer"));
+
+    public static final CommonDataAttachment<Integer> RUPTURE_TIMER =
+            register(CommonDataAttachment.create(o -> 0)
+                    .networkSynchronized(ByteBufCodecs.INT)
+                    .codec(Codec.INT)
+                    .build("rupture_timer"));
 
     public static CommonDataAttachment<?> lookup(ResourceLocation location) {
         return MAP.get(location);

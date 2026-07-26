@@ -19,6 +19,8 @@ public class LimbusCombatTracker {
     public boolean inCombat;
     public long combatStartTime;
     public long lastAction;
+    public long lastHit;
+    public long lastPhysicalHit;
 
     public static final long TIME_LIMIT = 600;
 
@@ -61,6 +63,10 @@ public class LimbusCombatTracker {
 
     public void onHit(DamageSource source) {
         if (triggersCombat(source)) {
+            if (source.is(LimbusDamageTypeTags.PHYSICAL)) {
+                lastPhysicalHit = mob.level().getGameTime();
+            }
+            lastHit = mob.level().getGameTime();
             if (!inCombat) {
                 startCombat();
             } else {
@@ -73,7 +79,7 @@ public class LimbusCombatTracker {
     }
 
     public static boolean triggersCombat(DamageSource source) {
-        return source.is(LimbusDamageTypeTags.LIMBUS) || source.getEntity() instanceof LivingEntity;
+        return true || source.is(LimbusDamageTypeTags.LIMBUS) || source.getEntity() instanceof LivingEntity;
     }
 
     public void startCombat() {
@@ -93,10 +99,17 @@ public class LimbusCombatTracker {
         lastAction = mob.level().getGameTime();
     }
 
+    public long getTimeSinceLastHit() {
+        return mob.level().getGameTime() - lastHit;
+    }
+
+    public long getTimeSinceLastPhysicalHit() {
+        return mob.level().getGameTime() - lastPhysicalHit;
+    }
+
     public void stopCombat() {
         inCombat = false;
         combatStartTime = -1;
-        lastAction = -1;
         LOG.info("Combat stopped for {}", mob);
         if (mob instanceof Player player) {
             player.sendSystemMessage(Component.literal("You have left combat"));

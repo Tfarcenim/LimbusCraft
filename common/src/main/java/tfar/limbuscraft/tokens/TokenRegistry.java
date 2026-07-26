@@ -19,6 +19,7 @@ public class TokenRegistry {
     public static final Token BURN = register(new BurnBane());
     public static final Token BLEED = register(new BleedBane());
     public static final Token TREMOR = register(new TremorBane());
+    public static final Token RUPTURE = register(new RuptureBane());
 
     static<T extends Token> T register(T token) {
         TOKENS.put(token.id(), token);
