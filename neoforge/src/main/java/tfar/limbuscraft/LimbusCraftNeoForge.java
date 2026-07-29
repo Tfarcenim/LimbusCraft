@@ -201,11 +201,18 @@ public class LimbusCraftNeoForge {
             }
         }
         Map<Token,TokenInstance> tokens = DataAttachmentUtil.getTokens(target);
-        TokenInstance tokenInstance = tokens.get(TokenRegistry.RUPTURE);
-        if  (tokenInstance != null) {
+        TokenInstance ruptureTokenInstance = tokens.get(TokenRegistry.RUPTURE);
+        if  (ruptureTokenInstance != null) {
             if (source.is(LimbusDamageTypeTags.PHYSICAL)) {
                 DataAttachmentUtil.setRuptureTimer(target,LimbusStats.DEFAULT_RUPTURE_TIMER);
-                tokenInstance.trigger(target);
+                ruptureTokenInstance.trigger(target);
+            }
+        }
+
+        TokenInstance sinkingTokenInstance = tokens.get(TokenRegistry.SINKING);
+        if  (sinkingTokenInstance != null) {
+            if (source.is(LimbusDamageTypeTags.PHYSICAL)) {
+                sinkingTokenInstance.trigger(target);
             }
         }
     }

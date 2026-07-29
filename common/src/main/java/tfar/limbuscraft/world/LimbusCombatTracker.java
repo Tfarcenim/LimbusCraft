@@ -10,6 +10,7 @@ import tfar.limbuscraft.LimbusCraft;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.ducks.LivingEntityDuck;
 import tfar.limbuscraft.tags.LimbusDamageTypeTags;
+import tfar.limbuscraft.tokens.TokenRegistry;
 
 public class LimbusCombatTracker {
 
@@ -110,6 +111,7 @@ public class LimbusCombatTracker {
     public void stopCombat() {
         inCombat = false;
         combatStartTime = -1;
+        DataAttachmentUtil.removeToken(mob, TokenRegistry.SINKING);
         LOG.info("Combat stopped for {}", mob);
         if (mob instanceof Player player) {
             player.sendSystemMessage(Component.literal("You have left combat"));

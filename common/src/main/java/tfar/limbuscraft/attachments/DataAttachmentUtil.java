@@ -1,6 +1,7 @@
 package tfar.limbuscraft.attachments;
 
 import net.minecraft.world.entity.LivingEntity;
+import tfar.limbuscraft.LimbusStats;
 import tfar.limbuscraft.platform.Services;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
@@ -20,7 +21,13 @@ public class DataAttachmentUtil {
     }
 
     public static void setSanity(LivingEntity entity, int sanity) {
-        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.SANITY, sanity);
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.SANITY,
+                Math.clamp(sanity, LimbusStats.MIN_SANITY, LimbusStats.MAX_SANITY));
+    }
+
+    public static void addSanity(LivingEntity entity, int delta) {
+        int value =  getSanity(entity);
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.SANITY, value + delta);
     }
 
     public static Map<Token, TokenInstance> getTokens(LivingEntity entity) {

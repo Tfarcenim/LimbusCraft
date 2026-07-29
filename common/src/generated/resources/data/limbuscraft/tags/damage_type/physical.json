@@ -1,0 +1,16 @@
+{
+  "values": [
+    "#minecraft:damages_helmet",
+    "#minecraft:is_drowning",
+    "#minecraft:is_explosion",
+    "#minecraft:is_fire",
+    "#minecraft:is_projectile",
+    "minecraft:cactus",
+    "minecraft:cramming",
+    "minecraft:freeze",
+    "minecraft:mob_attack",
+    "minecraft:player_attack",
+    "minecraft:spit",
+    "minecraft:sting"
+  ]
+}

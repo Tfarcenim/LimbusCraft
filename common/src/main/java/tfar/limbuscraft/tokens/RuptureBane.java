@@ -2,7 +2,6 @@ package tfar.limbuscraft.tokens;
 
 import net.minecraft.world.entity.LivingEntity;
 import tfar.limbuscraft.LimbusStats;
-import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.ducks.LivingEntityDuck;
 import tfar.limbuscraft.init.LimbusDamageTypes;
 import tfar.limbuscraft.world.LimbusCombatTracker;

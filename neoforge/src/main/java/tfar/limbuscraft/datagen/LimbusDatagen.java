@@ -6,6 +6,7 @@ import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import tfar.limbuscraft.datagen.tags.LimbusDamageTypeTagsProvider;
+import tfar.limbuscraft.datagen.tags.LimbusEntityTypeTagsProvider;
 import tfar.limbuscraft.init.LimbusBlocks;
 
 public class LimbusDatagen {
@@ -21,6 +22,7 @@ public class LimbusDatagen {
             event.addProvider(provider);
             lookup = provider.getRegistryProvider();
             event.addProvider(new LimbusDamageTypeTagsProvider(output, lookup, existingFileHelper));
+            event.addProvider(new LimbusEntityTypeTagsProvider(output, lookup, existingFileHelper));
         }
     }
 }

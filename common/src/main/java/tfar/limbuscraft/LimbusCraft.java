@@ -14,6 +14,7 @@ import tfar.limbuscraft.init.LimbusBlocks;
 import tfar.limbuscraft.init.LimbusItems;
 import tfar.limbuscraft.init.LimbusMenuTypes;
 import tfar.limbuscraft.platform.Services;
+import tfar.limbuscraft.tags.LimbusEntityTypeTags;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 import tfar.limbuscraft.tokens.TokenRegistry;
@@ -69,8 +70,8 @@ public class LimbusCraft {
                     }
                 }
 
-                if (duration % 200 == 0) {
-                    DataAttachmentUtil.setSanity(livingEntity,DataAttachmentUtil.getSanity(livingEntity)+5);
+                if (duration % 200 == 0 && hasSanity(livingEntity)) {
+                    DataAttachmentUtil.addSanity(livingEntity,5);
                 }
             }
         }
@@ -151,6 +152,10 @@ public class LimbusCraft {
         }
 
         DataAttachmentUtil.setStaggerThresholds(entity, staggerThresholds);
+    }
+
+    public static boolean hasSanity(LivingEntity livingEntity) {
+        return livingEntity.getType().is(LimbusEntityTypeTags.HAS_SANITY);
     }
 
     public static void checkForStagger(LivingEntity livingEntity, float damage) {

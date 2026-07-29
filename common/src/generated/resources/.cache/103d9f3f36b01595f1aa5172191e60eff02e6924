@@ -1,4 +1,8 @@
-// 1.21.1	2026-07-09T22:41:26.0558312	Registries
+// 1.21.1	2026-07-28T00:45:19.8070707	Registries
+41b24079c3adaa2d83bc58b2999f459622e80b8b data/limbuscraft/damage_type/envy.json
+85cfc54bed19a25fde4ddde01c77ee3f89f9bc70 data/limbuscraft/damage_type/gloom.json
+13c9212e923998bd25df006ccc5280915bb65eb0 data/limbuscraft/damage_type/gluttony.json
 7ea6eb638325726e8117bc21d016aa0b7ed3070f data/limbuscraft/damage_type/lust.json
 e419889a7ccd747c70a8c222169709fc0094c089 data/limbuscraft/damage_type/pride.json
+9a00ce3637eec5cb6fc4cd8c362576ebdbff2c91 data/limbuscraft/damage_type/sloth.json
 47ca2950d4d4cbee2214bc0618bd584aeba24e25 data/limbuscraft/damage_type/wrath.json
