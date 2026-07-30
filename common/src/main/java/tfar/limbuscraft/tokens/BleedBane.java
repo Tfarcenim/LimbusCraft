@@ -18,15 +18,19 @@ public class BleedBane extends Bane{
 
     @Override
     public void tick(LivingEntity entity, TokenInstance tokenInstance) {
-        int potency = tokenInstance.potency();
+        trigger(entity, tokenInstance);
+    }
 
-        DamageSource source = entity.damageSources().source(LimbusDamageTypes.LUST);
-        entity.hurt(source,potency);
+    @Override
+    public void trigger(LivingEntity livingEntity, TokenInstance tokenInstance) {
+        int potency = tokenInstance.potency();
+        DamageSource source = livingEntity.damageSources().source(LimbusDamageTypes.LUST);
+        livingEntity.hurt(source,potency);
         TokenInstance reducedCount = tokenInstance.increaseCount(-1);
         if (reducedCount.count() >0) {
-            DataAttachmentUtil.addOrReplaceToken(entity,reducedCount);
+            DataAttachmentUtil.addOrReplaceToken(livingEntity,reducedCount);
         } else {
-            DataAttachmentUtil.removeToken(entity,this);
+            DataAttachmentUtil.removeToken(livingEntity,this);
         }
     }
 }

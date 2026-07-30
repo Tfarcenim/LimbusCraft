@@ -187,4 +187,9 @@ public class LimbusCraft {
         }
         DataAttachmentUtil.setStaggerThresholds(livingEntity, staggerThresholds);
     }
+
+    public static void onLimbusCrit(LivingEntity target,LivingEntity attacker) {
+
+    }
+
 }

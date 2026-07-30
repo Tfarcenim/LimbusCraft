@@ -77,6 +77,7 @@ public class LimbusCraftNeoForge {
         NeoForge.EVENT_BUS.addListener(this::controlTeleport);
         NeoForge.EVENT_BUS.addListener(this::entityTickPre);
         NeoForge.EVENT_BUS.addListener(this::entityTickPost);
+        NeoForge.EVENT_BUS.addListener(this::livingDamagePre);
         NeoForge.EVENT_BUS.addListener(this::livingDamagePost);
     }
 
@@ -169,6 +170,25 @@ public class LimbusCraftNeoForge {
     void livingIncomingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         LivingEntity entity = event.getEntity();
+        Entity attacker = source.getEntity();
+
+        if (attacker instanceof LivingEntity livingAttacker) {
+            Map<Token, TokenInstance> attackerTokens = DataAttachmentUtil.getTokens(livingAttacker);
+            TokenInstance damageUpTokenInstance = attackerTokens.get(TokenRegistry.DAMAGE_UP);
+            if (damageUpTokenInstance != null) {
+                event.setAmount(event.getAmount() * (1 + damageUpTokenInstance.count()/10f));
+            }
+        }
+
+        Map<Token, TokenInstance> targetTokens = DataAttachmentUtil.getTokens(entity);
+
+        if (!source.is(LimbusDamageTypeTags.BYPASSES_LIMBUS_PROTECTION)) {
+            TokenInstance protectionTokenInstance = targetTokens.get(TokenRegistry.PROTECTION);
+            if (protectionTokenInstance != null) {
+                event.setAmount(Math.max(0,event.getAmount() * (1 - protectionTokenInstance.count()/10f)));
+            }
+        }
+
         if (!source.is(LimbusDamageTypeTags.LIMBUS)) {
             event.setAmount(event.getAmount() * 5);
         }
@@ -185,17 +205,29 @@ public class LimbusCraftNeoForge {
         ((LivingEntityDuck)event.getEntity()).getLimbusCombatTracker().onHit(source);
     }
 
-    void livingDamagePost(LivingDamageEvent.Post event) {
+    void livingDamagePre(LivingDamageEvent.Pre event) {
         DamageSource source = event.getSource();
         Entity attacker = source.getEntity();
         LivingEntity target = event.getEntity();
         LimbusCraft.checkForStagger(target, event.getNewDamage());
         if (attacker instanceof LivingEntity livingAttacker) {
-            Map<Token, TokenInstance> tokens = DataAttachmentUtil.getTokens(livingAttacker);
-            TokenInstance tokenInstance = tokens.get(TokenRegistry.BLEED);
-            if (tokenInstance != null) {
-                tokenInstance.tick(livingAttacker);
+            Map<Token, TokenInstance> attackerTokens = DataAttachmentUtil.getTokens(livingAttacker);
+            TokenInstance bleedTokenInstance = attackerTokens.get(TokenRegistry.BLEED);
+            if (bleedTokenInstance != null) {
+                bleedTokenInstance.trigger(livingAttacker);
             }
+
+            TokenInstance poiseTokenInstance = attackerTokens.get(TokenRegistry.POISE);
+            if (poiseTokenInstance != null && source.is(LimbusDamageTypeTags.PHYSICAL)) {
+                boolean rngCheck = poiseTokenInstance.potency() / 20f > attacker.getRandom().nextFloat();
+                if (rngCheck) {
+                    event.setNewDamage(event.getNewDamage() * 1.25f);
+                    LimbusCraft.onLimbusCrit(target,livingAttacker);
+                    //decrease count
+                    poiseTokenInstance.trigger(livingAttacker);
+                }
+            }
+
             if (livingAttacker.getMainHandItem().getItem() instanceof ShovelItem) {
                 LimbusCraft.triggerTremorBurst(target,1);
             }
@@ -215,6 +247,10 @@ public class LimbusCraftNeoForge {
                 sinkingTokenInstance.trigger(target);
             }
         }
+    }
+
+    void livingDamagePost(LivingDamageEvent.Post event) {
+
     }
 
     void attributeSetup(EntityAttributeModificationEvent event) {

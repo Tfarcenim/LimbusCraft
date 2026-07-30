@@ -6,6 +6,7 @@ import net.minecraft.data.tags.DamageTypeTagsProvider;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
 import tfar.limbuscraft.LimbusCraft;
@@ -34,6 +35,9 @@ public class LimbusDamageTypeTagsProvider extends DamageTypeTagsProvider {
         tag(DamageTypeTags.BYPASSES_ENCHANTMENTS).add(LimbusDamageTypes.GLUTTONY);
         tag(DamageTypeTags.BYPASSES_RESISTANCE).add(LimbusDamageTypes.GLUTTONY);
         tag(DamageTypeTags.BYPASSES_SHIELD).add(LimbusDamageTypes.GLUTTONY);
+        tag(LimbusDamageTypeTags.BYPASSES_LIMBUS_PROTECTION)
+                .addTag(Tags.DamageTypes.IS_TECHNICAL)
+                .add(LimbusDamageTypes.GLUTTONY);
 
         tag(LimbusDamageTypeTags.PHYSICAL)
                 .addTags(DamageTypeTags.DAMAGES_HELMET,DamageTypeTags.IS_DROWNING,DamageTypeTags.IS_EXPLOSION,

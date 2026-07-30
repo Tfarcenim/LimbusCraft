@@ -59,4 +59,8 @@ public record TokenInstance(Token token, int potency,int count) {
             DataAttachmentUtil.removeToken(livingEntity,token);
         }
     }
+
+    public void removeToken(LivingEntity entity) {
+        DataAttachmentUtil.removeToken(entity,token);
+    }
 }
