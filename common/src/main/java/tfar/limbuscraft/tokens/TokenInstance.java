@@ -35,6 +35,10 @@ public record TokenInstance(Token token, int potency,int count) {
         return new TokenInstance(token,potency,count - 1);
     }
 
+    public TokenInstance increment() {
+        return new TokenInstance(token,potency,count + 1);
+    }
+
     public TokenInstance withCount(int delta) {
         return new TokenInstance(token,potency,delta);
     }

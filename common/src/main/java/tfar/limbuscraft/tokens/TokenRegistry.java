@@ -4,6 +4,10 @@ import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import tfar.limbuscraft.LimbusCraft;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +30,11 @@ public class TokenRegistry {
     public static final Token DAMAGE_UP = register(new DamageUpBoon());
     public static final Token PROTECTION = register(new ProtectionBoon());
     public static final Token PARALYZE = register(new Bane("paralyze"));
-    public static final Token HASTE = register(new Boon("haste"));
+    public static final Token HASTE = register(new HasteBoon()
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                    LimbusCraft.id("haste"),.04, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            .addAttributeModifier(Attributes.ATTACK_SPEED,
+                    LimbusCraft.id("haste"),.04, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     //Damage Up: Works in Stacks, every stack increases someone’s damage by 10% of the original damage.
     // Fully remove all stacks of damage up every 10 seconds.

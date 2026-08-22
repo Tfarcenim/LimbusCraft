@@ -3,6 +3,7 @@ package tfar.limbuscraft.block;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -19,7 +20,7 @@ import tfar.limbuscraft.world.LimbusTableMenu;
 
 public class LimbusTableBlock extends Block {
     public static final MapCodec<LimbusTableBlock> CODEC = simpleCodec(LimbusTableBlock::new);
-    private static final Component CONTAINER_TITLE = Component.translatable("container.crafting");
+    public static final MutableComponent CONTAINER_TITLE = Component.translatable("container.mirror");
 
     public LimbusTableBlock(Properties properties) {
         super(properties);

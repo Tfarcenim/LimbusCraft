@@ -1,5 +1,6 @@
 package tfar.limbuscraft.attachments;
 
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
 import tfar.limbuscraft.LimbusStats;
 import tfar.limbuscraft.platform.Services;
@@ -40,17 +41,45 @@ public class DataAttachmentUtil {
 
     public static void addOrReplaceToken(LivingEntity entity, TokenInstance token) {
         Map<Token, TokenInstance> tokens = new HashMap<>(DataAttachmentUtil.getTokens(entity));
+
+        TokenInstance existingToken = tokens.get(token.token());
+
+        if (existingToken == null) {
+            onTokenAdded(entity, token);
+        } else {
+            onTokenUpdated(entity, token);
+        }
+
         tokens.put(token.token(),token);
         setTokens(entity,tokens);
     }
 
+    static void onTokenAdded(LivingEntity entity, TokenInstance token) {
+        token.token().addAttributeModifiers(entity.getAttributes(),token);
+    }
+
+    static void onTokenUpdated(LivingEntity entity, TokenInstance token) {
+        token.token().removeAttributeModifiers(entity.getAttributes());
+        token.token().addAttributeModifiers(entity.getAttributes(), token);
+        entity.refreshDirtyAttributes();
+    }
+
+    static void onTokenRemoved(LivingEntity entity, TokenInstance token) {
+        token.token().removeAttributeModifiers(entity.getAttributes());
+        entity.refreshDirtyAttributes();
+    }
+
     public static void removeToken(LivingEntity entity, Token token) {
         Map<Token, TokenInstance> tokens = new HashMap<>(DataAttachmentUtil.getTokens(entity));
+        onTokenRemoved(entity, tokens.get(token));
         tokens.remove(token);
         setTokens(entity,tokens);
     }
 
     public static void clearTokens(LivingEntity entity) {
+        for (Map.Entry<Token, TokenInstance> entry : DataAttachmentUtil.getTokens(entity).entrySet()) {
+            onTokenRemoved(entity, entry.getValue());
+        }
         clearValue(entity,CommonDataAttachments.TOKENS);
     }
 

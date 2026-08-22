@@ -25,6 +25,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShovelItem;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -228,7 +229,15 @@ public class LimbusCraftNeoForge {
                 }
             }
 
-            if (livingAttacker.getMainHandItem().getItem() instanceof ShovelItem) {
+            ItemStack attackingItem = livingAttacker.getMainHandItem();
+
+            LimbusItemAttributes limbusItemAttributes = LimbusStats.LIMBUS_ITEM_ATTRIBUTES.get(attackingItem.getItem());
+
+            if (limbusItemAttributes != null) {
+               limbusItemAttributes.apply(target);
+            }
+
+            if (attackingItem.getItem() instanceof ShovelItem) {
                 LimbusCraft.triggerTremorBurst(target,1);
             }
         }
@@ -247,6 +256,8 @@ public class LimbusCraftNeoForge {
                 sinkingTokenInstance.trigger(target);
             }
         }
+
+
     }
 
     void livingDamagePost(LivingDamageEvent.Post event) {

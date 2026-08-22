@@ -1,4 +1,5 @@
-// 1.21.1	2026-07-28T00:45:19.8065705	Tags for minecraft:damage_type mod id limbuscraft
+// 1.21.1	2026-08-20T19:10:11.3199517	Tags for minecraft:damage_type mod id limbuscraft
+ae35e9750d55e18a7d2b8a6486aab4c13e167d33 data/limbuscraft/tags/damage_type/bypasses_limbus_protection.json
 44c4225320312a0924cf7cfc8708998c0a6cf17e data/limbuscraft/tags/damage_type/limbus.json
 53cc033a7ca766f4790c44e8da2f47695b96c188 data/limbuscraft/tags/damage_type/physical.json
 46ca7b79a4ff6fadf0fc6f18903d847c4d7ccb53 data/limbuscraft/tags/damage_type/seven_deadly_sins.json

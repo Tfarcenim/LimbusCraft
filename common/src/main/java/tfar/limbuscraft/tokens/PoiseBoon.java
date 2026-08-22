@@ -2,7 +2,7 @@ package tfar.limbuscraft.tokens;
 
 import net.minecraft.world.entity.LivingEntity;
 
-public class PoiseBoon extends Boon{
+public class PoiseBoon extends Boon {
     public PoiseBoon() {
         super("poise");
     }

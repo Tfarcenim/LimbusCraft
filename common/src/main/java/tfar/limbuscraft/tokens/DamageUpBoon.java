@@ -9,7 +9,7 @@ public class DamageUpBoon extends Boon {
 
     @Override
     public boolean shouldTick(LivingEntity entity, long combatTimer) {
-        return combatTimer % 10 == 0;
+        return combatTimer % 200 == 0;
     }
 
     @Override

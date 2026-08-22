@@ -13,6 +13,7 @@ public class LimbusDatagen {
 
     public static void gather(GatherDataEvent event) {
         boolean server = event.includeServer();
+        boolean client = event.includeClient();
         DataGenerator gen = event.getGenerator();
         PackOutput output = gen.getPackOutput();
         var lookup = event.getLookupProvider();
@@ -23,6 +24,9 @@ public class LimbusDatagen {
             lookup = provider.getRegistryProvider();
             event.addProvider(new LimbusDamageTypeTagsProvider(output, lookup, existingFileHelper));
             event.addProvider(new LimbusEntityTypeTagsProvider(output, lookup, existingFileHelper));
+        }
+        if (client) {
+            event.addProvider(new LimbusLang(output));
         }
     }
 }

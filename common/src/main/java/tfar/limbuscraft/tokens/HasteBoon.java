@@ -2,9 +2,9 @@ package tfar.limbuscraft.tokens;
 
 import net.minecraft.world.entity.LivingEntity;
 
-public class ProtectionBoon extends Boon{
-    public ProtectionBoon() {
-        super("protection");
+public class HasteBoon extends Boon{
+    public HasteBoon() {
+        super("haste");
     }
 
     @Override
