@@ -11,6 +11,7 @@ import tfar.limbuscraft.attachments.CommonDataAttachments;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.ducks.LivingEntityDuck;
 import tfar.limbuscraft.init.LimbusBlocks;
+import tfar.limbuscraft.init.LimbusDataComponents;
 import tfar.limbuscraft.init.LimbusItems;
 import tfar.limbuscraft.init.LimbusMenuTypes;
 import tfar.limbuscraft.platform.Services;
@@ -46,6 +47,7 @@ public class LimbusCraft {
         CommonDataAttachments.init();
         LimbusBlocks.init();
         LimbusItems.init();
+        LimbusDataComponents.init();
         LimbusMenuTypes.init();
     }
 

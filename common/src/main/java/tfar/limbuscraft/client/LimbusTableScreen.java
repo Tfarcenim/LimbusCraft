@@ -1,5 +1,7 @@
 package tfar.limbuscraft.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -26,38 +28,81 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    Button tab0;
+    Button tab1;
+
+    Button button;
+    Button[] buttons = new Button[6];
+
+
+    @Override
     protected void init() {
         super.init();
 
-        ResourceLocation sprite = LimbusCraft.id("tab");
+        int a = 28;
 
-        Button tab0 = SpriteIconButton.builder(Component.empty(),b -> {},true)
-                .size(26, 32)
-                .sprite(sprite,26,64)
-                .build();
-
-        tab0.setX(leftPos);
+        tab0 = new TabButton(leftPos,topPos-a,26,32,Component.empty(),b -> {selectedTab = Tab.MAIN;
+            setVisibility();},Tab.MAIN);
         addRenderableWidget(tab0);
 
-        Button tab1 = SpriteIconButton.builder(Component.empty(),b -> {},true)
-                .size(26, 32)
-                .sprite(sprite,26,64)
-                .build();
-
-        tab1.setX(leftPos+26);
+        tab1 = new TabButton(leftPos+28,topPos-a,26,32,Component.empty(),b -> {selectedTab = Tab.SECONDARY;
+            setVisibility();},Tab.SECONDARY);
         addRenderableWidget(tab1);
+
+        button = Button.builder(Component.empty(),b -> sendButtonClick(LimbusTableMenu.ButtonUsed.TRANSFORM))
+                .bounds(leftPos+78,topPos+56,20,20).build();
+
+        button.visible = selectedTab == Tab.MAIN;
+        addRenderableWidget(button);
+
+        for (int i = 0; i < 6;i++) {
+            buttons[i] = Button.builder(Component.literal(i+""),b ->{})
+                    .bounds(leftPos+145,topPos+6+12 * i,20,12).build();
+
+            buttons[i].visible = selectedTab == Tab.SECONDARY;
+            addRenderableWidget(buttons[i]);
+        }
     }
 
-    public static class TabButton extends SpriteIconButton.CenteredIcon {
+    private void sendButtonClick(LimbusTableMenu.ButtonUsed pageData) {
+        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, pageData.ordinal());
+    }
+
+    void setVisibility() {
+        button.visible = selectedTab == Tab.MAIN;
+        for (int i = 0; i < 6;i++) {
+            buttons[i].visible = selectedTab == Tab.SECONDARY;
+        }
+    }
+
+    public class TabButton extends Button {
+
+
+        protected final Tab tab;
+
         protected static final ResourceLocation TAB = LimbusCraft.id("tab");
         protected static final ResourceLocation TAB_SELECTED = LimbusCraft.id("tab_selected");
-        protected TabButton(int p_295914_, int p_294852_, Component p_295609_, int p_294922_, int p_296462_, ResourceLocation p_295554_, OnPress p_294427_, @Nullable Button.CreateNarration p_330653_) {
-            super(p_295914_, p_294852_, p_295609_, p_294922_, p_296462_, p_295554_, p_294427_, p_330653_);
+
+        protected TabButton(int x, int y, int width, int height, Component message, OnPress onPress, Tab tab) {
+            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+            this.tab = tab;
         }
 
         @Override
-        public void renderWidget(GuiGraphics p_295402_, int p_295733_, int p_294839_, float p_296191_) {
-            super.renderWidget(p_295402_, p_295733_, p_294839_, p_296191_);
+        protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            Minecraft minecraft = Minecraft.getInstance();
+            guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
+            RenderSystem.enableBlend();
+            RenderSystem.enableDepthTest();
+            int i = this.getX();
+            int j = this.getY();
+            ResourceLocation sprite = this.tab == selectedTab ?  TAB_SELECTED : TAB;
+            guiGraphics.blitSprite(sprite, i, j,0, this.width, this.height);
         }
     }
 

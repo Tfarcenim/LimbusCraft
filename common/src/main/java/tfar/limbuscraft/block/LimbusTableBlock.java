@@ -37,7 +37,7 @@ public class LimbusTableBlock extends Block {
             return InteractionResult.SUCCESS;
         } else {
             player.openMenu(state.getMenuProvider(level, pos));
-            player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
+            //player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
             return InteractionResult.CONSUME;
         }
     }
@@ -45,8 +45,8 @@ public class LimbusTableBlock extends Block {
     @Override
     protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return new SimpleMenuProvider(
-                (p_52229_, p_52230_, p_52231_) ->
-                        new LimbusTableMenu(p_52229_, p_52230_/*, ContainerLevelAccess.create(level, pos)*/), CONTAINER_TITLE
+                (p_52229_, inventory, player) ->
+                        new LimbusTableMenu(p_52229_, inventory, ContainerLevelAccess.create(level, pos)), CONTAINER_TITLE
         );
     }
 }

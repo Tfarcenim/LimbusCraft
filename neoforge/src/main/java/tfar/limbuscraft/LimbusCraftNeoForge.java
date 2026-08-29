@@ -25,6 +25,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShovelItem;
 import net.neoforged.bus.api.EventPriority;
@@ -39,6 +40,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
@@ -46,6 +48,7 @@ import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.datagen.LimbusDatagen;
 import tfar.limbuscraft.ducks.LivingEntityDuck;
 import tfar.limbuscraft.init.LimbusDamageTypes;
+import tfar.limbuscraft.init.LimbusDataComponents;
 import tfar.limbuscraft.mixin.AttributeSupplierBuilderAccess;
 import tfar.limbuscraft.mixin.DefaultAttributesAccess;
 import tfar.limbuscraft.mixin.EntityAttributeModificationEventAccess;
@@ -80,6 +83,7 @@ public class LimbusCraftNeoForge {
         NeoForge.EVENT_BUS.addListener(this::entityTickPost);
         NeoForge.EVENT_BUS.addListener(this::livingDamagePre);
         NeoForge.EVENT_BUS.addListener(this::livingDamagePost);
+        NeoForge.EVENT_BUS.addListener(this::onBlockBreak);
     }
 
     void entityTickPre(EntityTickEvent.Pre event) {
@@ -262,6 +266,14 @@ public class LimbusCraftNeoForge {
 
     void livingDamagePost(LivingDamageEvent.Post event) {
 
+    }
+
+    void onBlockBreak(BlockEvent.BreakEvent event) {
+        Player player = event.getPlayer();
+        ItemStack stack = player.getMainHandItem();
+        if (stack.has(LimbusDataComponents.LIMBUS_WEAPON)) {
+            event.setCanceled(true);
+        }
     }
 
     void attributeSetup(EntityAttributeModificationEvent event) {

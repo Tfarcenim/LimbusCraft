@@ -15,6 +15,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityAttachment;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -25,10 +26,12 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import tfar.limbuscraft.LimbusCraft;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
+import tfar.limbuscraft.init.LimbusDataComponents;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
 
@@ -42,6 +45,7 @@ public class LimbusCraftClientNeoForge {
         bus.addListener(this::setup);
         bus.addListener(this::registerOverlay);
         NeoForge.EVENT_BUS.addListener(this::renderOverlayEvent);
+        NeoForge.EVENT_BUS.addListener(this::tooltips);
         bus.addListener(this::reloadListener);
         //NeoForge.EVENT_BUS.addListener(this::renderAboveNameTag);
     }
@@ -142,6 +146,14 @@ public class LimbusCraftClientNeoForge {
 
     void setup(FMLClientSetupEvent event) {
         LimbusCraftClient.setup();
+    }
+
+    void tooltips(ItemTooltipEvent event) {
+        ItemStack stack = event.getItemStack();
+        List<Component> tooltip = event.getToolTip();
+        if (stack.has(LimbusDataComponents.LIMBUS_WEAPON)) {
+            tooltip.add(Component.literal("Limbus Weapon"));
+        }
     }
 
     void registerOverlay(RegisterGuiLayersEvent event) {
