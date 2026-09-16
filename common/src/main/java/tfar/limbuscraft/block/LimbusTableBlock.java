@@ -4,18 +4,20 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CraftingTableBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.world.LimbusTableMenu;
 
 public class LimbusTableBlock extends Block {
@@ -45,8 +47,28 @@ public class LimbusTableBlock extends Block {
     @Override
     protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return new SimpleMenuProvider(
-                (p_52229_, inventory, player) ->
-                        new LimbusTableMenu(p_52229_, inventory, ContainerLevelAccess.create(level, pos)), CONTAINER_TITLE
+                (i, inventory, player) ->
+                        new LimbusTableMenu(i, inventory, ContainerLevelAccess.create(level, pos),new LimbusDataSlot(player)), CONTAINER_TITLE
         );
     }
+
+    public static class LimbusDataSlot extends DataSlot {
+
+        private final Player player;
+
+        public LimbusDataSlot(Player player) {
+            this.player = player;
+        }
+
+        @Override
+        public int get() {
+            return DataAttachmentUtil.getLimbusSlot(player);
+        }
+
+        @Override
+        public void set(int value) {
+            DataAttachmentUtil.setLimbusSlot(player, value);
+        }
+    }
+
 }

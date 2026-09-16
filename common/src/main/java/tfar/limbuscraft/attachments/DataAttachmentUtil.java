@@ -114,4 +114,24 @@ public class DataAttachmentUtil {
     public static void setRuptureTimer(LivingEntity entity, int staggerTimer) {
         Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.RUPTURE_TIMER, staggerTimer);
     }
+
+    public static int getLimbusSlot(LivingEntity entity) {
+        return Services.PLATFORM.getAttachedValue(entity,CommonDataAttachments.LIMBUS_SLOT);
+    }
+
+    public static void setLimbusSlot(LivingEntity entity, int limbusSlot) {
+        if (limbusSlot <= 0) limbusSlot = 9;
+        if (limbusSlot >= 10) limbusSlot = 1;
+        Services.PLATFORM.setAttachedValue(entity,CommonDataAttachments.LIMBUS_SLOT, limbusSlot);
+    }
+
+    public static void incLimbusSlot(LivingEntity entity) {
+        int slot = getLimbusSlot(entity);
+        setLimbusSlot(entity, slot + 1);
+    }
+
+    public static void decLimbusSlot(LivingEntity entity) {
+        int slot = getLimbusSlot(entity);
+        setLimbusSlot(entity, slot - 1);
+    }
 }

@@ -4,12 +4,9 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.init.LimbusDataComponents;
 import tfar.limbuscraft.init.LimbusMenuTypes;
 
@@ -17,14 +14,17 @@ public class LimbusTableMenu extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
 
+    public final DataSlot dataSlot;
+
     protected final SimpleContainer simpleContainer = new SimpleContainer(1);
 
     public LimbusTableMenu(int containerId, Inventory inventory) {
-        this(containerId,inventory,ContainerLevelAccess.NULL);
+        this(containerId,inventory,ContainerLevelAccess.NULL, DataSlot.standalone());
     }
-    public LimbusTableMenu(int containerId, Inventory inventory, ContainerLevelAccess access) {
+    public LimbusTableMenu(int containerId, Inventory inventory, ContainerLevelAccess access, DataSlot dataSlot) {
         super(LimbusMenuTypes.LIMBUS_TABLE, containerId);
         this.access = access;
+        this.dataSlot = dataSlot;
 
         addSlot(new Slot(simpleContainer, 0, 80, 35));
 
@@ -37,6 +37,7 @@ public class LimbusTableMenu extends AbstractContainerMenu {
         for (int l = 0; l < 9; l++) {
             this.addSlot(new Slot(inventory, l, 8 + l * 18, 142));
         }
+        addDataSlot(dataSlot);
     }
 
     @Override
@@ -63,6 +64,14 @@ public class LimbusTableMenu extends AbstractContainerMenu {
                     }
                     return true;
                 }
+                case LEFT_SLOT -> {
+                    DataAttachmentUtil.decLimbusSlot(player);
+                    return true;
+                }
+                case RIGHT_SLOT -> {
+                    DataAttachmentUtil.incLimbusSlot(player);
+                    return true;
+                }
             }
         }
 
@@ -77,7 +86,7 @@ public class LimbusTableMenu extends AbstractContainerMenu {
     }
 
     public enum ButtonUsed {
-        TRANSFORM;
+        TRANSFORM,LEFT_SLOT,RIGHT_SLOT;
     }
 
 }

@@ -33,10 +33,24 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.renderLabels(guiGraphics, mouseX, mouseY);
+        guiGraphics.drawString(this.font, Component.literal("Slot"),
+                32, 20, 0x404040, false);
+        guiGraphics.drawString(this.font, Component.literal(""+menu.dataSlot.get()),
+                40, 40, 0x404040, false);
+
+    }
+
     Button tab0;
     Button tab1;
 
     Button button;
+
+    Button buttonLeft;
+    Button buttonRight;
+
     Button[] buttons = new Button[6];
 
 
@@ -56,6 +70,15 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
 
         button = Button.builder(Component.empty(),b -> sendButtonClick(LimbusTableMenu.ButtonUsed.TRANSFORM))
                 .bounds(leftPos+78,topPos+56,20,20).build();
+
+        buttonLeft = Button.builder(Component.literal("<"),b -> sendButtonClick(LimbusTableMenu.ButtonUsed.LEFT_SLOT))
+                .bounds(leftPos+16,topPos+36,16,16).build();
+
+        buttonRight = Button.builder(Component.literal(">"),b -> sendButtonClick(LimbusTableMenu.ButtonUsed.RIGHT_SLOT))
+                .bounds(leftPos+52,topPos+36,16,16).build();
+
+        addRenderableWidget(buttonLeft);
+        addRenderableWidget(buttonRight);
 
         button.visible = selectedTab == Tab.MAIN;
         addRenderableWidget(button);

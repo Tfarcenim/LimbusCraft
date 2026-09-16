@@ -3,6 +3,7 @@ package tfar.limbuscraft.attachments;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
+import tfar.limbuscraft.LimbusPlayerUpgrade;
 import tfar.limbuscraft.platform.Services;
 import tfar.limbuscraft.tokens.Token;
 import tfar.limbuscraft.tokens.TokenInstance;
@@ -29,6 +30,13 @@ public class CommonDataAttachments {
             .build("tokens")
     );
 
+    public static final CommonDataAttachment<List<LimbusPlayerUpgrade.Instance>> PLAYER_UPGRADES = register(CommonDataAttachment
+            .<List<LimbusPlayerUpgrade.Instance>>create(o -> new ArrayList<>())
+            .networkSynchronized(LimbusPlayerUpgrade.Instance.STREAM_CODEC.apply(ByteBufCodecs.list()))
+            .codec(LimbusPlayerUpgrade.Instance.CODEC.listOf())
+            .build("player_upgrades")
+    );
+
     public static final CommonDataAttachment<List<Float>> STAGGER_THRESHOLDS =
             register(CommonDataAttachment.<List<Float>>create(o -> List.of())
                     .networkSynchronized(ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list()))
@@ -53,6 +61,14 @@ public class CommonDataAttachments {
                     .networkSynchronized(ByteBufCodecs.INT)
                     .codec(Codec.INT)
                     .build("rupture_timer"));
+
+
+    public static final CommonDataAttachment<Integer> LIMBUS_SLOT =
+            register(CommonDataAttachment.create(o -> 1)
+                    .copyOnDeath()
+                    .networkSynchronized(ByteBufCodecs.INT)
+                    .codec(Codec.INT)
+                    .build("limbus_slot"));
 
     public static CommonDataAttachment<?> lookup(ResourceLocation location) {
         return MAP.get(location);
