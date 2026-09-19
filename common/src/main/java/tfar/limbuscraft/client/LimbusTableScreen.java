@@ -4,18 +4,26 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo;
 import tfar.limbuscraft.LimbusCraft;
+import tfar.limbuscraft.LimbusPlayerUpgrade;
+import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.world.LimbusTableMenu;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> {
 
-    private static final ResourceLocation CRAFTING_TABLE_LOCATION = LimbusCraft.id("textures/gui/mirror.png");
+    private static final ResourceLocation BACKGROUND = LimbusCraft.id("background");
+    private static final ResourceLocation INVENTORY_SLOTS = LimbusCraft.id("inventory_slots");
+    private static final ResourceLocation LARGE_SLOT = LimbusCraft.id("large_slot");
 
     private Tab selectedTab = Tab.MAIN;
 
@@ -25,6 +33,8 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
 
     public LimbusTableScreen(LimbusTableMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
+        imageHeight = 200;
+        inventoryLabelY = menu.inventoryY - 11;
     }
 
     @Override
@@ -36,11 +46,43 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawString(this.font, Component.literal("Slot"),
-                32, 20, 0x404040, false);
-        guiGraphics.drawString(this.font, Component.literal(""+menu.dataSlot.get()),
-                40, 40, 0x404040, false);
 
+        switch (selectedTab) {
+            case MAIN -> {
+            guiGraphics.drawString(this.font, Component.literal("Slot"),
+                    32, 20, 0x404040, false);
+            guiGraphics.drawString(this.font, Component.literal("" + menu.dataSlot.get()),
+                    40, 40, 0x404040, false);
+            }
+
+            case SECONDARY -> {
+                int i = 0;
+                List<LimbusPlayerUpgrade> ordered = LimbusPlayerUpgrade.ordered();
+                List<LimbusPlayerUpgrade.Instance> instances = DataAttachmentUtil.getLimbusUpgrades(minecraft.player);
+                if (instances == null) {
+                    instances = new ArrayList<>();
+                }
+
+                for (int j = 0; j < ordered.size(); j++) {
+                    LimbusPlayerUpgrade value = ordered.get(j);
+
+                    int curLevel = j < instances.size() ? instances.get(j).levels() : 0;
+
+                    int y = 20 + i * 16;
+
+                    guiGraphics.drawString(this.font, Component.translatable(value.attribute().value().getDescriptionId()),
+                            6, y, 0x404040, false);
+
+
+                    guiGraphics.drawString(this.font, Component.literal("level: " + curLevel),
+                            80, y, 0x404040, false);
+
+                    guiGraphics.drawString(this.font, Component.literal("+" + value.factor()),
+                            145, y, 0x404040, false);
+                    i++;
+                }
+            }
+        }
     }
 
     Button tab0;
@@ -51,7 +93,9 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     Button buttonLeft;
     Button buttonRight;
 
-    Button[] buttons = new Button[6];
+    static int buttonCount = 5;
+
+    Button[] buttons = new Button[buttonCount];
 
 
     @Override
@@ -80,16 +124,26 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
         addRenderableWidget(buttonLeft);
         addRenderableWidget(buttonRight);
 
-        button.visible = selectedTab == Tab.MAIN;
         addRenderableWidget(button);
 
-        for (int i = 0; i < 6;i++) {
-            buttons[i] = Button.builder(Component.literal(i+""),b ->{})
-                    .bounds(leftPos+145,topPos+6+12 * i,20,12).build();
+        List<LimbusPlayerUpgrade.Instance> instances = DataAttachmentUtil.getLimbusUpgrades(minecraft.player);
+        for (int i = 0; i < buttons.length;i++) {
+            LimbusPlayerUpgrade.Instance instance = i < instances.size() ? instances.get(i) : null;
 
-            buttons[i].visible = selectedTab == Tab.SECONDARY;
+            int finalI = i;
+            buttons[i] = Button.builder(Component.literal("+"), b -> upgradeStat(b, finalI))
+                    .tooltip(Tooltip.create(Component.literal("Cost:" + (LimbusPlayerUpgrade.scaling(instance != null ?
+                            instance.levels():0)))))
+                    .bounds(leftPos+imageWidth - 50,topPos+16+16 * i,16,14).build();
+
             addRenderableWidget(buttons[i]);
         }
+
+        setVisibility();
+    }
+
+    void upgradeStat(Button b,int stat) {
+
     }
 
     private void sendButtonClick(LimbusTableMenu.ButtonUsed pageData) {
@@ -97,8 +151,8 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     }
 
     void setVisibility() {
-        button.visible = selectedTab == Tab.MAIN;
-        for (int i = 0; i < 6;i++) {
+        button.visible = buttonLeft.visible = buttonRight.visible = selectedTab == Tab.MAIN;
+        for (int i = 0; i < buttons.length;i++) {
             buttons[i].visible = selectedTab == Tab.SECONDARY;
         }
     }
@@ -133,7 +187,12 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int i = this.leftPos;
         int j = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(CRAFTING_TABLE_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-
+        guiGraphics.blitSprite(BACKGROUND,leftPos,topPos,
+                imageWidth,imageHeight);
+        guiGraphics.blitSprite(INVENTORY_SLOTS,leftPos+menu.inventoryX-1,topPos+menu.inventoryY-1,
+                162,76);
+        if (selectedTab == Tab.MAIN) {
+            guiGraphics.blitSprite(LARGE_SLOT,leftPos+80-5,topPos+35-5, 26,26);
+        }
     }
 }

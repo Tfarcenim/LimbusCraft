@@ -1,9 +1,11 @@
 {
-  "gui": {
-    "scaling": {
-      "type": "tile",
-      "width": 81,
-      "height": 9
+    "gui": {
+        "scaling": {
+            "type": "nine_slice",
+            "width": 12,
+            "height": 12,
+            "border": 4
+        }
     }
-  }
 }
+

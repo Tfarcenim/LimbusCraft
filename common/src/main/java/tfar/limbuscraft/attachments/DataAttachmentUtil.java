@@ -2,6 +2,7 @@ package tfar.limbuscraft.attachments;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
+import tfar.limbuscraft.LimbusPlayerUpgrade;
 import tfar.limbuscraft.LimbusStats;
 import tfar.limbuscraft.platform.Services;
 import tfar.limbuscraft.tokens.Token;
@@ -133,5 +134,9 @@ public class DataAttachmentUtil {
     public static void decLimbusSlot(LivingEntity entity) {
         int slot = getLimbusSlot(entity);
         setLimbusSlot(entity, slot - 1);
+    }
+
+    public static List<LimbusPlayerUpgrade.Instance> getLimbusUpgrades(LivingEntity entity) {
+        return Services.PLATFORM.getAttachedValue(entity,CommonDataAttachments.PLAYER_UPGRADES);
     }
 }

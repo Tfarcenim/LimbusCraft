@@ -9,8 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 //Upgrade 1: +3 HP (max +360)
 //Upgrade 2: +0.1 Attack Damage (max +6 damage)
@@ -19,13 +18,14 @@ import java.util.Map;
 //Upgrade 5: +0.02 Attack speed (max +1)
 public record LimbusPlayerUpgrade(String name, Holder<Attribute> attribute, double factor, int maxLevels) {
 
-    public static final Map<String, LimbusPlayerUpgrade> ATTRIBUTES = new HashMap<>();
+    public static final Map<String, LimbusPlayerUpgrade> ATTRIBUTES = new LinkedHashMap<>();
+    private static List<LimbusPlayerUpgrade> LIST;
 
     public static final LimbusPlayerUpgrade HEALTH = register(new LimbusPlayerUpgrade("health",Attributes.MAX_HEALTH,3,120));
-    public static final LimbusPlayerUpgrade ATTACK_DAMAGE = register(new LimbusPlayerUpgrade("attack_damage",Attributes.ATTACK_DAMAGE,3,120));
-    public static final LimbusPlayerUpgrade MOVEMENT_SPEED = register(new LimbusPlayerUpgrade("movement_speed",Attributes.MAX_HEALTH,3,120));
-    public static final LimbusPlayerUpgrade ENTITY_REACH = register(new LimbusPlayerUpgrade("entity_reach",Attributes.MAX_HEALTH,3,120));
-    public static final LimbusPlayerUpgrade ATTACK_SPEED = register(new LimbusPlayerUpgrade("attack_speed",Attributes.ATTACK_SPEED,3,120));
+    public static final LimbusPlayerUpgrade ATTACK_DAMAGE = register(new LimbusPlayerUpgrade("attack_damage",Attributes.ATTACK_DAMAGE,.1,120));
+    public static final LimbusPlayerUpgrade MOVEMENT_SPEED = register(new LimbusPlayerUpgrade("movement_speed",Attributes.MAX_HEALTH,.02,120));
+    public static final LimbusPlayerUpgrade ENTITY_REACH = register(new LimbusPlayerUpgrade("entity_reach",Attributes.MAX_HEALTH,.05,120));
+    public static final LimbusPlayerUpgrade ATTACK_SPEED = register(new LimbusPlayerUpgrade("attack_speed",Attributes.ATTACK_SPEED,.02,120));
 
     public static final Codec<LimbusPlayerUpgrade> CODEC = Codec.STRING.xmap(ATTRIBUTES::get, LimbusPlayerUpgrade::name);
 
@@ -36,6 +36,17 @@ public record LimbusPlayerUpgrade(String name, Holder<Attribute> attribute, doub
     public static LimbusPlayerUpgrade register(LimbusPlayerUpgrade attribute) {
         ATTRIBUTES.put(attribute.name, attribute);
         return attribute;
+    }
+
+    public static List<LimbusPlayerUpgrade> ordered() {
+        if (LIST == null) {
+            LIST = new ArrayList<>(ATTRIBUTES.values());
+        }
+        return LIST;
+    }
+
+    public static long scaling(long currentLevel) {
+        return (currentLevel+1) * (currentLevel+1);
     }
 
     public record Instance(LimbusPlayerUpgrade attribute, int levels) {

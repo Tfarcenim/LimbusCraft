@@ -18,6 +18,9 @@ public class LimbusTableMenu extends AbstractContainerMenu {
 
     protected final SimpleContainer simpleContainer = new SimpleContainer(1);
 
+    public final int inventoryX = 8;
+    public final int inventoryY = 120;
+
     public LimbusTableMenu(int containerId, Inventory inventory) {
         this(containerId,inventory,ContainerLevelAccess.NULL, DataSlot.standalone());
     }
@@ -30,12 +33,12 @@ public class LimbusTableMenu extends AbstractContainerMenu {
 
         for (int k = 0; k < 3; k++) {
             for (int i1 = 0; i1 < 9; i1++) {
-                this.addSlot(new Slot(inventory, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
+                this.addSlot(new Slot(inventory, i1 + k * 9 + 9, inventoryX + i1 * 18, inventoryY + k * 18));
             }
         }
 
         for (int l = 0; l < 9; l++) {
-            this.addSlot(new Slot(inventory, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(inventory, l, 8 + l * 18, inventoryY + 58));
         }
         addDataSlot(dataSlot);
     }
@@ -86,7 +89,7 @@ public class LimbusTableMenu extends AbstractContainerMenu {
     }
 
     public enum ButtonUsed {
-        TRANSFORM,LEFT_SLOT,RIGHT_SLOT;
+        UPGRADE_0,UPGRADE_1,UPGRADE_2,UPGRADE_3,UPGRADE_4,TRANSFORM,LEFT_SLOT,RIGHT_SLOT;
     }
 
 }
