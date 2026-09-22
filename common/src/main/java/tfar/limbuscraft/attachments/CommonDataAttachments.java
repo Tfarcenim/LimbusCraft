@@ -30,10 +30,11 @@ public class CommonDataAttachments {
             .build("tokens")
     );
 
-    public static final CommonDataAttachment<List<LimbusPlayerUpgrade.Instance>> PLAYER_UPGRADES = register(CommonDataAttachment
-            .<List<LimbusPlayerUpgrade.Instance>>create(o -> new ArrayList<>())
-            .networkSynchronized(LimbusPlayerUpgrade.Instance.STREAM_CODEC.apply(ByteBufCodecs.list()))
-            .codec(LimbusPlayerUpgrade.Instance.CODEC.listOf())
+    public static final CommonDataAttachment<Map<LimbusPlayerUpgrade,LimbusPlayerUpgrade.Instance>> PLAYER_UPGRADES = register(CommonDataAttachment
+            .<Map<LimbusPlayerUpgrade,LimbusPlayerUpgrade.Instance>>create(o -> new LinkedHashMap<>())
+            .networkSynchronized(ByteBufCodecs.map(LinkedHashMap::new,
+                    LimbusPlayerUpgrade.STREAM_CODEC,LimbusPlayerUpgrade.Instance.STREAM_CODEC))
+            .codec(Codec.unboundedMap(LimbusPlayerUpgrade.CODEC,LimbusPlayerUpgrade.Instance.CODEC))
             .build("player_upgrades")
     );
 

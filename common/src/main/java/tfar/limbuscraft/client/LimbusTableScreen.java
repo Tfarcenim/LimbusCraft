@@ -9,13 +9,11 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo;
 import tfar.limbuscraft.LimbusCraft;
 import tfar.limbuscraft.LimbusPlayerUpgrade;
 import tfar.limbuscraft.attachments.DataAttachmentUtil;
 import tfar.limbuscraft.world.LimbusTableMenu;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,15 +56,15 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
             case SECONDARY -> {
                 int i = 0;
                 List<LimbusPlayerUpgrade> ordered = LimbusPlayerUpgrade.ordered();
-                List<LimbusPlayerUpgrade.Instance> instances = DataAttachmentUtil.getLimbusUpgrades(minecraft.player);
-                if (instances == null) {
-                    instances = new ArrayList<>();
-                }
+                Map<LimbusPlayerUpgrade, LimbusPlayerUpgrade.Instance> instances = DataAttachmentUtil.getPlayerUpgrades(minecraft.player);
+
 
                 for (int j = 0; j < ordered.size(); j++) {
                     LimbusPlayerUpgrade value = ordered.get(j);
 
-                    int curLevel = j < instances.size() ? instances.get(j).levels() : 0;
+                    LimbusPlayerUpgrade.Instance instance = instances.get(value);
+
+                    int curLevel = instance != null ? instance.levels() : 0;
 
                     int y = 20 + i * 16;
 
@@ -126,14 +124,10 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
 
         addRenderableWidget(button);
 
-        List<LimbusPlayerUpgrade.Instance> instances = DataAttachmentUtil.getLimbusUpgrades(minecraft.player);
         for (int i = 0; i < buttons.length;i++) {
-            LimbusPlayerUpgrade.Instance instance = i < instances.size() ? instances.get(i) : null;
 
             int finalI = i;
             buttons[i] = Button.builder(Component.literal("+"), b -> upgradeStat(b, finalI))
-                    .tooltip(Tooltip.create(Component.literal("Cost:" + (LimbusPlayerUpgrade.scaling(instance != null ?
-                            instance.levels():0)))))
                     .bounds(leftPos+imageWidth - 50,topPos+16+16 * i,16,14).build();
 
             addRenderableWidget(buttons[i]);
@@ -143,7 +137,19 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     }
 
     void upgradeStat(Button b,int stat) {
+        sendButtonClick(LimbusTableMenu.ButtonUsed.values()[stat]);
+    }
 
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        Map<LimbusPlayerUpgrade, LimbusPlayerUpgrade.Instance> instances = DataAttachmentUtil.getPlayerUpgrades(minecraft.player);
+        for (int i = 0; i < buttons.length; i++) {
+            Button b = buttons[i];
+            LimbusPlayerUpgrade.Instance instance = instances.get(LimbusPlayerUpgrade.byIndex(i));
+            b.setTooltip(Tooltip.create(Component.literal("Cost:" + (LimbusPlayerUpgrade.getNextCost(instance != null ?
+                    instance.levels():0)))));
+        }
     }
 
     private void sendButtonClick(LimbusTableMenu.ButtonUsed pageData) {

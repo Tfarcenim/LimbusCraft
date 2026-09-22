@@ -1,7 +1,8 @@
 package tfar.limbuscraft.attachments;
 
-import net.minecraft.world.effect.MobEffect;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import tfar.limbuscraft.LimbusPlayerUpgrade;
 import tfar.limbuscraft.LimbusStats;
 import tfar.limbuscraft.platform.Services;
@@ -136,7 +137,24 @@ public class DataAttachmentUtil {
         setLimbusSlot(entity, slot - 1);
     }
 
-    public static List<LimbusPlayerUpgrade.Instance> getLimbusUpgrades(LivingEntity entity) {
+    public static Map<LimbusPlayerUpgrade,LimbusPlayerUpgrade.Instance> getPlayerUpgrades(LivingEntity entity) {
         return Services.PLATFORM.getAttachedValue(entity,CommonDataAttachments.PLAYER_UPGRADES);
+    }
+
+    public static void resetPlayerUpgrades(ServerPlayer player) {
+        clearValue(player,CommonDataAttachments.PLAYER_UPGRADES);
+        for (LimbusPlayerUpgrade upgrade: LimbusPlayerUpgrade.ordered()) {
+            player.getAttribute(upgrade.attribute()).removeModifier(LimbusPlayerUpgrade.ID);
+        }
+    }
+
+    public static void setPlayerUpgrades(Player player, Map<LimbusPlayerUpgrade, LimbusPlayerUpgrade.Instance> instances) {
+        Services.PLATFORM.setAttachedValue(player,CommonDataAttachments.PLAYER_UPGRADES, instances);
+        for (LimbusPlayerUpgrade upgrade: LimbusPlayerUpgrade.ordered()) {
+            player.getAttribute(upgrade.attribute()).removeModifier(LimbusPlayerUpgrade.ID);
+        }
+        for (Map.Entry<LimbusPlayerUpgrade, LimbusPlayerUpgrade.Instance> entry : instances.entrySet()) {
+            player.getAttribute(entry.getKey().attribute()).addOrReplacePermanentModifier(entry.getValue().modifyAttribute());
+        }
     }
 }

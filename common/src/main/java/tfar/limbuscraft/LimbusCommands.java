@@ -63,7 +63,18 @@ public class LimbusCommands {
                                 )
                         )
                 )
+                .then(Commands.literal("player_upgrades")
+                        .then(Commands.literal("reset")
+                                .executes(LimbusCommands::resetPlayerUpgrades)
+                        )
+                )
         );
+    }
+
+    static int resetPlayerUpgrades(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        DataAttachmentUtil.resetPlayerUpgrades(player);
+        return 1;
     }
 
     static int clearTokensFromSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
