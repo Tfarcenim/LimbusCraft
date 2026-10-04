@@ -27,6 +27,7 @@ public class LimbusDatagen {
         }
         if (client) {
             event.addProvider(new LimbusLang(output));
+            event.addProvider(new LimbusBlockStateProvider(output, existingFileHelper));
         }
     }
 }

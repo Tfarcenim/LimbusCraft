@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "limbuscraft:block/mirror",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "limbuscraft:block/mirror"
+    },
+    "facing=south": {
+      "model": "limbuscraft:block/mirror",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "limbuscraft:block/mirror",
+      "y": 270
+    }
+  }
+}
