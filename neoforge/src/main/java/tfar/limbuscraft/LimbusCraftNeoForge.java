@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.commands.data.DataAccessor;
 import net.minecraft.server.commands.data.DataCommands;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +35,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
@@ -174,6 +176,7 @@ public class LimbusCraftNeoForge {
 
     void livingIncomingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
+        if (source.is(Tags.DamageTypes.IS_TECHNICAL)) return;
         LivingEntity entity = event.getEntity();
         Entity attacker = source.getEntity();
 
@@ -207,6 +210,9 @@ public class LimbusCraftNeoForge {
             event.setAmount(event.getAmount() * multiplier);
         }
 
+        if (event.getAmount() == Double.POSITIVE_INFINITY) {//avoid weirdness
+            event.setAmount(Float.MAX_VALUE);
+        }
         ((LivingEntityDuck)event.getEntity()).getLimbusCombatTracker().onHit(source);
     }
 

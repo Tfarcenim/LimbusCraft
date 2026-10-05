@@ -32,6 +32,7 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
     public LimbusTableScreen(LimbusTableMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageHeight = 200;
+        imageWidth = 256;
         inventoryLabelY = menu.inventoryY - 11;
     }
 
@@ -73,10 +74,10 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
 
 
                     guiGraphics.drawString(this.font, Component.literal("level: " + curLevel),
-                            80, y, 0x404040, false);
+                            150, y, 0x404040, false);
 
-                    guiGraphics.drawString(this.font, Component.literal("+" + value.factor()),
-                            145, y, 0x404040, false);
+                    //guiGraphics.drawString(this.font, Component.literal("+" + value.factor()),
+                     //       145, y, 0x404040, false);
                     i++;
                 }
             }
@@ -127,8 +128,10 @@ public class LimbusTableScreen extends AbstractContainerScreen<LimbusTableMenu> 
         for (int i = 0; i < buttons.length;i++) {
 
             int finalI = i;
-            buttons[i] = Button.builder(Component.literal("+"), b -> upgradeStat(b, finalI))
-                    .bounds(leftPos+imageWidth - 50,topPos+16+16 * i,16,14).build();
+            List<LimbusPlayerUpgrade> ordered = LimbusPlayerUpgrade.ordered();
+
+            buttons[i] = Button.builder(Component.literal("+"+ordered.get(i).factor()), b -> upgradeStat(b, finalI))
+                    .bounds(leftPos+imageWidth - 48,topPos+16+16 * i,40,16).build();
 
             addRenderableWidget(buttons[i]);
         }

@@ -22,7 +22,7 @@ public class LimbusTableMenu extends AbstractContainerMenu {
 
     protected final SimpleContainer simpleContainer = new SimpleContainer(1);
 
-    public final int inventoryX = 8;
+    public final int inventoryX = 36;
     public final int inventoryY = 120;
 
     public LimbusTableMenu(int containerId, Inventory inventory) {
@@ -43,7 +43,7 @@ public class LimbusTableMenu extends AbstractContainerMenu {
         }
 
         for (int l = 0; l < 9; l++) {
-            this.addSlot(new Slot(inventory, l, 8 + l * 18, inventoryY + 58));
+            this.addSlot(new Slot(inventory, l, inventoryX + l * 18, inventoryY + 58));
         }
         addDataSlot(dataSlot);
     }
